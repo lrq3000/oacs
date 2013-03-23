@@ -4,9 +4,11 @@
 import argparse
 import sys
 
-import oacs.run
+from oacs.run import Runner
 import interactive
 
+## Parse the commandline arguments
+# @param argv A list of strings containing the arguments (optional)
 def parse_cmdline_args(argv=None):
     if argv is None:
         argv = sys.argv[1:]
@@ -46,6 +48,8 @@ def parse_cmdline_args(argv=None):
 
     return (args, extras, parser)
 
+## Main entry point, processes commandline arguments and then launch the appropriate module
+# @param argv A list of strings containing the arguments (optional)
 def main(argv=None):
     #-- Parsing (loading) the arguments
     [args, extras, parser] = parse_cmdline_args(argv)
@@ -61,11 +65,13 @@ def main(argv=None):
         interactive.launch_notebook(extras)
     # Scripting mode: load the config and make the constructs, but do not run the main loop
     elif args['norun']:
-        oacs.run.init(args, extras)
+        runner = Runner()
+        runner.init(args, extras)
     # Run the main OACS loop by default
     else:
-        oacs.run.init(args, extras)
-        oacs.run.run()
+        runner = Runner()
+        runner.init(args, extras)
+        runner.run()
 
 if __name__ == '__main__':
     main()

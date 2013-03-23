@@ -13,6 +13,8 @@ if sys.version_info < (2,6):
 
 import oacs.main
 
+## Main entry point for the OACS program
+# @param argv A list of strings containing the arguments (optional)
 def main(argv=None):
     oacs.main.main(argv)
 

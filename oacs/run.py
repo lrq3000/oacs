@@ -3,24 +3,28 @@
 
 from oacs.configparser import ConfigParser
 
-def init(args, extras):
-    config = ConfigParser()
-    configfile = args['config']; del args['config']
-    config.init(configfile)
-    config.load(args, extras)
+class Runner:
 
-    return True
 
-# main loop
-def run():
-    oacs.configparser
-    oacs.learn
-    while 1:
-        oacs.inputparser # ou plutot on charge d'abord le input parser, et apres on fait InputParser.read()
-        oacs.predict
+    def init(self, args, extras):
+        self.config = ConfigParser()
+        configfile = args['config']; del args['config']
+        self.config.init(configfile)
+        self.config.load(args, extras)
 
-    return True
+        return True
+
+    # main loop
+    def run(self):
+        oacs.configparser
+        oacs.learn
+        while 1:
+            oacs.inputparser # ou plutot on charge d'abord le input parser, et apres on fait InputParser.read()
+            oacs.predict
+
+        return True
 
 if __name__ == '__main__':
-    init()
-    run()
+    runner = Runner()
+    runner.init()
+    runner.run()

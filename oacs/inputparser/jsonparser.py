@@ -1,4 +1,11 @@
 #!/usr/bin/env python
+# encoding: utf-8
+
+## @package jsonparser
+#
+# General purpose JSON parser
+
+from oacs.inputparser.base import BaseParser
 
 from auxlib import *
 import re, os
@@ -9,15 +16,27 @@ if json is None:
     if json is None:
         raise RuntimeError('Unable to find a json implementation')
 
-reg = re.compile(r"^(.+)$", re.MULTILINE)
-class JsonParser(object):
-    def __init__(self, *args, **kwargs):
-        return object.__init__(self, *args, **kwargs)
+## JsonParser
+#
+# General purpose JSON parser
+class JsonParser(BaseParser):
 
-    @staticmethod
-    def load(jsonfile, addrootarray=False):
+    ## Private usage regexp to add missing commas between each object
+    reg = re.compile(r"^(.+)$", re.MULTILINE)
+
+    ## @var config
+    # An instance of the ConfigParser object, already loaded
+
+    ## Constructor
+    # @param config An instance of the ConfigParser class
+    def __init__(self, config, *args, **kwargs):
+        return BaseParser.__init__(self, config, *args, **kwargs)
+
+    ## Load the content of a file as JSON and return a Python object corresponding to the JSON tree
+    # @param file Path to the input file to read
+    def load(self, file, addrootarray=False, *args, **kwargs):
         try:
-            f = open(jsonfile, 'rb') # open in binary mode to avoid line returns translation (else the reading will be flawed!). We have to do it both at saving and at reading.
+            f = open(file, 'rb') # open in binary mode to avoid line returns translation (else the reading will be flawed!). We have to do it both at saving and at reading.
             if (addrootarray):
                 jsonraw = f.read()
                 jsonraw = os.linesep.join([s for s in jsonraw.splitlines() if s]) # remove empty lines
@@ -33,8 +52,7 @@ class JsonParser(object):
             print e
             return False
 
-    @staticmethod
-    def save(jsoncontent, jsonfile):
+    def save(self, jsoncontent, jsonfile, *args, **kwargs):
         try:
             f = open(jsonfile, 'wb') # open in binary mode to avoid line returns translation (else the reading will be flawed!). We have to do it both at saving and at reading.
             f.write( json.dumps(jsoncontent, sort_keys=True, indent=4) ) # write the file as a json serialized string, but beautified to be more human readable
