@@ -25,11 +25,13 @@ def parse_cmdline_args(argv=None):
     parser.add_argument('--help', '-help', '-h', dest='help', action='store_true', default=False,
                         help='show this help message and exit')
     parser.add_argument('--interactive', '-i', dest='interactive', action='store_true', default=False,
-                        help='interactive mode, open an ipython notebook web interface (you need ipython notebook to be installed)')
+                        help='interactive mode, open an ipython notebook web interface (you need ipython notebook to be installed). Note: any additional argument will be propagated to the IPython Notebook.')
     parser.add_argument('--norun', '-n', dest='norun', action='store_true', default=False,
                         help='do not run the main loop, only load the constructs and config file, and then let you use these constructs in whatever way you want using Python or Notebook.')
     parser.add_argument('--config', '-c', dest='config', action='store', default=None,
                         help='specify a path to a specific configuration file you want to use')
+    parser.add_argument('--input', '-i', dest='input', action='store', default=None,
+                        help='input data file')
 
 
 

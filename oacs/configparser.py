@@ -33,19 +33,20 @@ class ConfigParser(object):
         # Overwriting with recognized commandline switches
         if pargs:
             for key, value in pargs.iteritems():
-                self.config[key] = value
+                # only add the argument in config if the argument has a value (not False nor None) and this key is not already defined in the config (so an argument can only overwrite config if defined)
+                if not (self.config.has_key(key) and not value):
+                    self.config[key] = value
 
         # Overwriting with extras commandline switches
         if extras:
-            keymem = None # store the key in case this is an argument that accepts a value
-            for key in extras.itervalues():
-                # Storing an argument accepting a value (here it's the 2nd iteration, we already detected the key and now we process the value)
-                if keymem:
-                    self.config[keymem] = key
-                    keymem = None
-                # If this argument accepts a value (starts with --), we memorize the key and we will store this argument at the next iteration
-                elif '--' in key:
-                    keymem = key
-                # Else this is a simple argument, we just store it
+            i = 0
+            while i < len(extras):
+                key = extras[i]
+                # Check if the argument accepts a value
+                if '--' in key and i+1 < len(extras) and not '--' in extras[i+1]: # if the argument begins with --, and there is an argument after this one, and the next argument is in fact a value (does not begin with --), we store it with the value
+                    self.config[key.lstrip('-')] = extras[i+1]
+                    i += 1 # skip the next argument (which we used as a value)
+                # Else this argument has no value, we just set it to True
                 else:
                     self.config[key.lstrip('-')] = True
+                i += 1

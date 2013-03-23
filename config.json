@@ -1,4 +1,6 @@
 {
+    "input":"somevaluehere",
+    "help":"hihi",
     "test":"a test value",
     "test2":"N"
 }
