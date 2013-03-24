@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# encoding: utf-8
 
 import sys, exceptions
 
@@ -23,5 +24,13 @@ def str2int(s):
     except exceptions.ValueError:
         return int(float(s))
 
-def import_class(module_name, class_name, dir_name=None):
-    return None
+def import_class(packagepath, classname):
+    mod = __import__(packagepath, fromlist=[classname])
+    myclass = getattr(mod, classname)
+    return myclass
+
+#def import_class(fullpackage):
+    #d = fullpackage.rfind(".")
+    #classname = fullpackage[d+1:len(fullpackage)]
+    #module = __import__(fullpackage[0:d], globals(), locals(), [classname])
+    #return getattr(module, classname)

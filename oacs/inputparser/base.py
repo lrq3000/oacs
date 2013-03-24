@@ -18,7 +18,7 @@ class BaseParser(BaseClass):
     ## Constructor
     # @param config An instance of the ConfigParser class
     def __init__(self, config, *args, **kwargs):
-        return BaseClass.__init__(config, *args, **kwargs)
+        return BaseClass.__init__(self, config, *args, **kwargs)
 
     ## Load the content of a file and return it
     # @param file Path to the input file to read

@@ -7,7 +7,7 @@
 
 from oacs.inputparser.base import BaseParser
 
-from auxlib import *
+from oacs.auxlib import *
 import re, os
 
 json = import_module('ujson')

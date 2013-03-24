@@ -7,7 +7,7 @@
 
 from oacs.inputparser.jsonparser import JsonParser
 
-from auxlib import *
+from oacs.auxlib import *
 import re, os
 
 json = import_module('ujson')
@@ -32,4 +32,3 @@ class InterframeParser(JsonParser):
     # @param file Path to the input file to read
     def load(self, file, addrootarray=False, *args, **kwargs):
         jsoncontent = JsonParser.load(file, addrootarray, *args, **kwargs)
-        
