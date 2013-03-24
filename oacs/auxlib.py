@@ -22,3 +22,6 @@ def str2int(s):
         return int(s)
     except exceptions.ValueError:
         return int(float(s))
+
+def import_class(module_name, class_name, dir_name=None):
+    return None

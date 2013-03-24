@@ -28,8 +28,8 @@ def parse_cmdline_args(argv=None):
                         help='show this help message and exit')
     parser.add_argument('--interactive', '-i', dest='interactive', action='store_true', default=False,
                         help='interactive mode, open an ipython notebook web interface (you need ipython notebook to be installed). Note: any additional argument will be propagated to the IPython Notebook.')
-    parser.add_argument('--norun', '-n', dest='norun', action='store_true', default=False,
-                        help='do not run the main loop, only load the constructs and config file, and then let you use these constructs in whatever way you want using Python or Notebook.')
+    parser.add_argument('--script', '-s', dest='script', action='store_true', default=False,
+                        help='do not run the main loop, only load the constructs and config file, and then return a Runner instance so that you can use these constructs in whatever way you want using Python or Notebook.')
     parser.add_argument('--config', '-c', dest='config', action='store', default=None,
                         help='specify a path to a specific configuration file you want to use')
     parser.add_argument('--input', '-i', dest='input', action='store', default=None,
@@ -64,9 +64,10 @@ def main(argv=None):
     elif args['interactive']:
         interactive.launch_notebook(extras)
     # Scripting mode: load the config and make the constructs, but do not run the main loop
-    elif args['norun']:
+    elif args['script']:
         runner = Runner()
         runner.init(args, extras)
+        return runner
     # Run the main OACS loop by default
     else:
         runner = Runner()

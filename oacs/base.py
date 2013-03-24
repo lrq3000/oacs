@@ -21,11 +21,22 @@ class BaseClass(object):
             raise SystemExit(220)
 
     ## Register the configuration to be directly accessible as a variable inside this object
-    # @param config An instance of the ConfigParser class
+    # @param config An instance of the ConfigParser class, or path to the config file
     def loadconfig(self, config, *args, **kwargs):
+
+        # No config, we quit
         if not config:
             return False
 
-        self.config = config
+        # If we were supplied a string, we consider it to be the path to the config file to load
+        if isinstance(config, basestring):
+            # Loading the config
+            from configparser import ConfigParser
+            self.config = ConfigParser()
+            self.config.init(config)
+            self.config.load(*args)
+        # Else we already have a loaded config object, we just reference it locally
+        else:
+            self.config = config
 
         return True

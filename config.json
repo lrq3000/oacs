@@ -1,6 +1,21 @@
 {
-    "input":"somevaluehere",
+    "classes": {
+        "inputparser":"InterframeParser"
+        },
     "help":"hihi",
     "test":"a test value",
-    "test2":"N"
+    "test2":"N",
+    "optimization": {
+        "post": {
+            "crossval": {
+                "variables": [
+                    "X",
+                    "Y",
+                    "Theta",
+                    "Lambda",
+                    "K"
+                    ]
+                }
+            }
+        }
 }
