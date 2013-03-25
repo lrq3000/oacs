@@ -19,6 +19,7 @@ class BaseClass(object):
         if not self.loadconfig(config):
             print('CRITICAL ERROR : COULD NOT LOAD CONFIG')
             raise SystemExit(220)
+        return object.__init__(self)
 
     ## Register the configuration to be directly accessible as a variable inside this object
     # @param config An instance of the ConfigParser class, or path to the config file

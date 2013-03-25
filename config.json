@@ -1,6 +1,6 @@
 {
     "classes": {
-        "inputparser": "InterframeParser"
+        "inputparser": "all"
         },
     "help":"hihi",
     "test":"a test value",

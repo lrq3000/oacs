@@ -32,26 +32,47 @@ class JsonParser(BaseParser):
     def __init__(self, config, *args, **kwargs):
         return BaseParser.__init__(self, config, *args, **kwargs)
 
-    ## Load the content of a file as JSON and return a Python object corresponding to the JSON tree
+    ## Load the whole content of a file at once as JSON and return a Python object corresponding to the JSON tree
     # @param file Path to the input file to read
-    def load(self, file, addrootarray=False, *args, **kwargs):
-        try:
-            f = open(file, 'rb') # open in binary mode to avoid line returns translation (else the reading will be flawed!). We have to do it both at saving and at reading.
-            if (addrootarray):
-                jsonraw = f.read()
-                jsonraw = os.linesep.join([s for s in jsonraw.splitlines() if s]) # remove empty lines
-                jsonraw = reg.sub(r'\1,', jsonraw) # add the missing commas between the objects in the root array
-                jsonraw = jsonraw.rstrip(',') # remove the last comma
-                jsonraw = "[%s]" % jsonraw # convert to a json array of json objects (just by enclosing in [])
-            else:
-                jsonraw = f.read()
-            jsoncontent = json.loads( jsonraw )
-            f.close()
-            return jsoncontent
-        except Exception, e:
-            print e
-            return False
+    # @param addrootarray Set to True if the json was outputted line-by-line, and we need to add a root array to "glue" them all
+    def load(self, file=None, addrootarray=False, *args, **kwargs):
+        # Read the file (the parent object provides a common and exception-handled way to load an entire file at once, so we don't have to care about that)
+        jsonraw = BaseParser.load(self, file, addrootarray, *args, **kwargs)
 
+        # If the json was outputted line-by-line, we need to add a root array to "glue" them all
+        if (addrootarray):
+            jsonraw = os.linesep.join([s for s in jsonraw.splitlines() if s]) # remove empty lines
+            jsonraw = reg.sub(r'\1,', jsonraw) # add the missing commas between the objects in the root array
+            jsonraw = jsonraw.rstrip(',') # remove the last comma
+            jsonraw = "[%s]" % jsonraw # convert to a json array of json objects (just by enclosing in [])
+
+        # convert the json string into a json object (ie: a native python dict)
+        jsoncontent = json.loads( jsonraw )
+
+        # return the result
+        return jsoncontent
+
+    ## Read a file line-by-line and return the content as a JSON construct (ie: Python dict) (this is a generator)
+    # @param file Path to the input file to read
+    # @param addrootarray Set to True if the json was outputted line-by-line, and we need to add a root array to "glue" them all
+    def read(self, file=None, addrootarray=False, *args, **kwargs):
+        # Read the file (the parent object provides a common and exception-handled way to load an entire file at once, so we don't have to care about that)
+        jsonraw = BaseParser.read(self, file, addrootarray, *args, **kwargs)
+
+        # If the json was outputted line-by-line, we need to add a root array to "glue" them all
+        if (addrootarray):
+            jsonraw = os.linesep.join([s for s in jsonraw.splitlines() if s]) # remove empty lines
+            jsonraw = reg.sub(r'\1,', jsonraw) # add the missing commas between the objects in the root array
+            jsonraw = jsonraw.rstrip(',') # remove the last comma
+            jsonraw = "[%s]" % jsonraw # convert to a json array of json objects (just by enclosing in [])
+
+        # convert the json string into a json object (ie: a native python dict)
+        jsoncontent = json.loads( jsonraw )
+
+        # return the result
+        yield jsoncontent
+
+    ## Save a JSON construct, UNUSED
     def save(self, jsoncontent, jsonfile, *args, **kwargs):
         try:
             f = open(jsonfile, 'wb') # open in binary mode to avoid line returns translation (else the reading will be flawed!). We have to do it both at saving and at reading.

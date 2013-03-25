@@ -28,7 +28,15 @@ class InterframeParser(JsonParser):
     def __init__(self, config, *args, **kwargs):
         return JsonParser.__init__(self, config, *args, **kwargs)
 
-    ## Load the content of a file as JSON and return a Python object corresponding to the JSON tree
+    ## Load the whole content of a file containing interframes in JSON format and return pandas's DataFrames
     # @param file Path to the input file to read
-    def load(self, file, addrootarray=False, *args, **kwargs):
-        jsoncontent = JsonParser.load(file, addrootarray, *args, **kwargs)
+    # @param addrootarray Set to True if the json was outputted line-by-line, and we need to add a root array to "glue" them all
+    def load(self, file=None, addrootarray=False, *args, **kwargs):
+        jsoncontent = JsonParser.load(self, file, addrootarray, *args, **kwargs)
+        return (X_raw, X, Y_raw, Y) # must always return X_raw, X, Y_raw and Y
+
+    ## Read interframes one-line-by-one and return a pandas's DataFrame (this is a generator)
+    # @param file Path to the input file to read
+    # @param addrootarray Set to True if the json was outputted line-by-line, and we need to add a root array to "glue" them all
+    def read(self, file=None, addrootarray=False, *args, **kwargs):
+        yield (X_raw, X, Y_raw, Y)

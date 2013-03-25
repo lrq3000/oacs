@@ -9,13 +9,23 @@ if json is None:
     if json is None:
         raise RuntimeError('Unable to find a json implementation')
 
+## ConfigParser
+#
+# Configuration parser, will parse and load in memory the configuration and commandline switches
 class ConfigParser(object):
+
+    # Configuration file path
     configfile = 'config.json'
+
+    # Configuration parameters tree (will be referenced by almost all other objects across the whole application)
     config = []
 
+    ## Constructor
     def __init__(self, *args, **kwargs):
         return object.__init__(self, *args, **kwargs)
 
+    ## Initialize the ConfigParser object by checking that the configuration file exists
+    # @param configfile Path to the configuration file (must exists or else the application will crash!)
     def init(self, configfile=None, *args, **kwargs):
         if configfile:
             try:
@@ -25,6 +35,9 @@ class ConfigParser(object):
                 print "Can't open the specified configuration file %s, error: %s" % (configfile, str(e))
                 return
 
+    ## Load a configuration file into the local dict
+    # @param pargs Recognized (processed) commandline arguments (this will overwrite parameters from the configuration file in case of conflicts)
+    # @param extras Unrecognized (unprocessed) commandline arguments (will also overwrite parameters from the configuration file)
     def load(self, pargs=None, extras=None, *args, **kwargs):
         # Loading the configuration file
         with file(self.configfile) as f:
@@ -50,3 +63,15 @@ class ConfigParser(object):
                 else:
                     self.config[key.lstrip('-')] = True
                 i += 1
+
+    ## Save the current configuration (with commandline arguments processed) into a file
+    # @param file Path to where the configuration file should be saved
+    def save(self, file, *args, **kwargs):
+        try:
+            f = open(file, 'wb') # open in binary mode to avoid line returns translation (else the reading will be flawed!). We have to do it both at saving and at reading.
+            f.write( json.dumps(self.config, sort_keys=True, indent=4) ) # write the config as a json serialized string, but beautified to be more human readable
+            f.close()
+            return True
+        except Exception, e:
+            print str(e)
+            return False
