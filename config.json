@@ -1,6 +1,6 @@
 {
     "classes": {
-        "inputparser": "all"
+        "inputparser": "JsonParser"
         },
     "help":"hihi",
     "test":"a test value",

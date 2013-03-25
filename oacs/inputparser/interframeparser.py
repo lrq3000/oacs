@@ -40,3 +40,11 @@ class InterframeParser(JsonParser):
     # @param addrootarray Set to True if the json was outputted line-by-line, and we need to add a root array to "glue" them all
     def read(self, file=None, addrootarray=False, *args, **kwargs):
         yield (X_raw, X, Y_raw, Y)
+
+    ## Reset the cursor position to 0 (read the file back from the beginning)
+    def resetpos(self, *args, **kwargs):
+        BaseParser.resetpos(self, *args, **kwargs)
+
+    ## Set the cursor position to read the file from a specified byte
+    def setpos(self, pos=0, *args, **kwargs):
+        BaseParser.setpos(self, pos, *args, **kwargs)

@@ -73,7 +73,11 @@ class Runner:
             print("CRITICAL ERROR: importing a class failed: classname: %s package: %s\nException: %s" % (package_full, classname, str(e)))
             raise RuntimeError('Unable to import a class')
 
-    # main loop
+    ## Train the system to learn how to detect cheating
+    def learn(self):
+        return True
+
+    ## Main/Prediction loop
     def run(self):
         oacs.configparser
         oacs.learn

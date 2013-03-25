@@ -35,14 +35,14 @@ class JsonParser(BaseParser):
     ## Load the whole content of a file at once as JSON and return a Python object corresponding to the JSON tree
     # @param file Path to the input file to read
     # @param addrootarray Set to True if the json was outputted line-by-line, and we need to add a root array to "glue" them all
-    def load(self, file=None, addrootarray=False, *args, **kwargs):
+    def load(self, file=None, addrootarray=True, *args, **kwargs):
         # Read the file (the parent object provides a common and exception-handled way to load an entire file at once, so we don't have to care about that)
         jsonraw = BaseParser.load(self, file, addrootarray, *args, **kwargs)
 
         # If the json was outputted line-by-line, we need to add a root array to "glue" them all
         if (addrootarray):
             jsonraw = os.linesep.join([s for s in jsonraw.splitlines() if s]) # remove empty lines
-            jsonraw = reg.sub(r'\1,', jsonraw) # add the missing commas between the objects in the root array
+            jsonraw = self.reg.sub(r'\1,', jsonraw) # add the missing commas between the objects in the root array
             jsonraw = jsonraw.rstrip(',') # remove the last comma
             jsonraw = "[%s]" % jsonraw # convert to a json array of json objects (just by enclosing in [])
 
@@ -56,21 +56,21 @@ class JsonParser(BaseParser):
     # @param file Path to the input file to read
     # @param addrootarray Set to True if the json was outputted line-by-line, and we need to add a root array to "glue" them all
     def read(self, file=None, addrootarray=False, *args, **kwargs):
-        # Read the file (the parent object provides a common and exception-handled way to load an entire file at once, so we don't have to care about that)
-        jsonraw = BaseParser.read(self, file, addrootarray, *args, **kwargs)
+        # Read the file (the parent object provides a common and exception-handled way to read a file line-by-line, so we don't have to care about that)
+        for jsonraw in BaseParser.read(self, file, addrootarray, *args, **kwargs):
 
-        # If the json was outputted line-by-line, we need to add a root array to "glue" them all
-        if (addrootarray):
-            jsonraw = os.linesep.join([s for s in jsonraw.splitlines() if s]) # remove empty lines
-            jsonraw = reg.sub(r'\1,', jsonraw) # add the missing commas between the objects in the root array
-            jsonraw = jsonraw.rstrip(',') # remove the last comma
-            jsonraw = "[%s]" % jsonraw # convert to a json array of json objects (just by enclosing in [])
+            # If the json was outputted line-by-line, we need to add a root array to "glue" them all
+            if (addrootarray):
+                jsonraw = os.linesep.join([s for s in jsonraw.splitlines() if s]) # remove empty lines
+                jsonraw = reg.sub(r'\1,', jsonraw) # add the missing commas between the objects in the root array
+                jsonraw = jsonraw.rstrip(',') # remove the last comma
+                jsonraw = "[%s]" % jsonraw # convert to a json array of json objects (just by enclosing in [])
 
-        # convert the json string into a json object (ie: a native python dict)
-        jsoncontent = json.loads( jsonraw )
+            # convert the json string into a json object (ie: a native python dict)
+            jsoncontent = json.loads( jsonraw )
 
-        # return the result
-        yield jsoncontent
+            # return the result
+            yield jsoncontent
 
     ## Save a JSON construct, UNUSED
     def save(self, jsoncontent, jsonfile, *args, **kwargs):
@@ -82,6 +82,14 @@ class JsonParser(BaseParser):
         except Exception, e:
             print e
             return False
+
+    ## Reset the cursor position to 0 (read the file back from the beginning)
+    def resetpos(self, *args, **kwargs):
+        BaseParser.resetpos(self, *args, **kwargs)
+
+    ## Set the cursor position to read the file from a specified byte
+    def setpos(self, pos=0, *args, **kwargs):
+        BaseParser.setpos(self, pos, *args, **kwargs)
 
 # Some debug testing here
 if __name__ == '__main__':

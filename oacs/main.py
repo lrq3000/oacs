@@ -32,8 +32,14 @@ def parse_cmdline_args(argv=None):
                         help='do not run the main loop, only load the constructs and config file, and then return a Runner instance so that you can use these constructs in whatever way you want using Python or Notebook.')
     parser.add_argument('--config', '-c', dest='config', action='store', default=None,
                         help='specify a path to a specific configuration file you want to use')
-    parser.add_argument('--input', '-i', dest='input', action='store', default=None,
-                        help='input data file')
+    parser.add_argument('--inputfile', '-i', dest='inputfile', action='store', default=None,
+                        help='input file')
+    parser.add_argument('--outputfile', '-o', dest='outputfile', action='store', default=None,
+                        help='output file (when --learn is set, the output file will contain the learned best parameters, else it will output the predicted cheaters list)')
+    parser.add_argument('--playerstable', '-p', dest='playerstable', action='store', default=None,
+                        help='file containing the players table (list of all players that connected). This is optional, but if set, the outputfile will contain extended identification informations (like ip and nickname instead of playerid) if set.')
+    parser.add_argument('--learn', '-l', dest='learn', action='store_true', default=False,
+                        help='Train the system to learn how to detect cheating using the specified algorithm and input file.')
 
 
 
@@ -68,6 +74,10 @@ def main(argv=None):
         runner = Runner()
         runner.init(args, extras)
         return runner
+    elif args['learn']:
+        runner = Runner()
+        runner.init(args, extras)
+        runner.learn()
     # Run the main OACS loop by default
     else:
         runner = Runner()
