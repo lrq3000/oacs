@@ -8,6 +8,7 @@ import os
 class Runner:
 
     rootdir = 'oacs'
+    vars = {} # we create a reference at startup so that this dict can be passed as a reference to children objects
 
     ## Initialize a runner object, with all constructs necessary to use the algorithms and process data according to the provided configuration file and commandline arguments
     # @param args recognized and processed commandline arguments
@@ -75,7 +76,18 @@ class Runner:
 
     ## Train the system to learn how to detect cheating
     def learn(self):
+        # @var vars contain a dynamical dict of variables used for data mining, and will be passed to every other computational function
+        self.updatevars(self.learningalgo.learn(**self.vars))
+        #eg: return {'X': df, 'Y': something, etc..}
         return True
+
+    ## Update the local dict vars of variables
+    #
+    # This function is used as a proxy to accept any arbitrary number of returned arguments from functions, and will store them locally, and then the vars dict will be passed onto other children objects
+    def updatevars(self, dict):
+        if not hasattr(self, 'vars'):
+            self.vars = {}
+        self.vars.update(dict) # add new variables from dict and merge updated values for already existing variables
 
     ## Main/Prediction loop
     def run(self):
