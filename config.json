@@ -1,10 +1,12 @@
 {
     "classes": {
-        "inputparser": "JsonParser"
+        "inputparser": "InterframeParser"
         },
     "help":"hihi",
     "test":"a test value",
     "test2":"N",
+    "datafile":"data.txt",
+    "typesfile":"types.txt",
     "optimization": {
         "post": {
             "crossval": {

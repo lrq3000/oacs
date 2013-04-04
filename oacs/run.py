@@ -8,6 +8,8 @@ import os
 class Runner:
 
     rootdir = 'oacs'
+
+    ## @var vars contain a dynamical dict of variables used for data mining, and will be passed to every other computational function
     vars = {} # we create a reference at startup so that this dict can be passed as a reference to children objects
 
     ## Initialize a runner object, with all constructs necessary to use the algorithms and process data according to the provided configuration file and commandline arguments
@@ -76,8 +78,12 @@ class Runner:
 
     ## Train the system to learn how to detect cheating
     def learn(self):
-        # @var vars contain a dynamical dict of variables used for data mining, and will be passed to every other computational function
+        if not self.config.config['bigdata']:
+            self.updatevars(self.inputparser.load())
+        else:
+            self.updatevars(self.inputparser.read())
         self.updatevars(self.learningalgo.learn(**self.vars))
+        # dans learningalgo faire un if self.config.config['bigdata'] self.learn_bulk() or self.learn_bigdata()
         #eg: return {'X': df, 'Y': something, etc..}
         return True
 
