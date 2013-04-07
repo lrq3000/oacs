@@ -5,7 +5,7 @@
 #
 # Parse the data from a file containing interframes in CSV format
 
-from oacs.inputparser.base import BaseParser
+from oacs.inputparser.baseparser import BaseParser
 
 from oacs.auxlib import *
 import os

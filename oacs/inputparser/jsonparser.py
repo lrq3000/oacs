@@ -5,7 +5,7 @@
 #
 # General purpose JSON parser
 
-from oacs.inputparser.base import BaseParser
+from oacs.inputparser.baseparser import BaseParser
 
 from oacs.auxlib import *
 import re, os

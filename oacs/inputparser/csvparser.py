@@ -5,7 +5,7 @@
 #
 # A simple parser to parse the data from a file containing data in CSV format and return a Pandas structure
 
-from oacs.inputparser.base import BaseParser
+from oacs.inputparser.baseparser import BaseParser
 
 from oacs.auxlib import *
 import os

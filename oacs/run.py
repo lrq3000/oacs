@@ -125,10 +125,19 @@ class Runner:
     ## Update the local dict vars of variables
     #
     # This function is used as a proxy to accept any arbitrary number of returned arguments from functions, and will store them locally, and then the vars dict will be passed onto other children objects
-    def updatevars(self, dict):
+    def updatevars(self, dictofvars):
+        # Create the local vars dict if it does not exist
         if not hasattr(self, 'vars'):
             self.vars = {}
-        self.vars.update(dict) # add new variables from dict and merge updated values for already existing variables
+        # Update/add the values inside dictofvars (if it is a dictionary of variables)
+        if type(dictofvars) == type(dict()):
+            self.vars.update(dictofvars) # add new variables from dict and merge updated values for already existing variables
+        # Else, it may be a list or an object or just a scalar (this means the function is not conforming to the dev standards), then can't know where to put those results and we just memorize them inside a "lastout" entry as-is.
+        else:
+            # Delete the previous output
+            if self.vars["lastout"]: del self.vars["lastout"]
+            # Save this output
+            self.vars.update({"lastout": dictofvars})
 
     ## Main/Prediction loop
     def run(self, executelist=None):
