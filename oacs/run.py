@@ -76,15 +76,50 @@ class Runner:
             print("CRITICAL ERROR: importing a class failed: classname: %s package: %s\nException: %s" % (package_full, classname, str(e)))
             raise RuntimeError('Unable to import a class')
 
+    ## Generically call any submodule given a list of dicts containing {"submodule name": "method of the class to call"}
+    # @param executelist A list containing the sequence of modules to launch (Note: the order of the contained elements matters!)
+    def generic_call(self, executelist):
+        # Loop through all modules in run_learn list
+        for mod in executelist:
+            # Catch exceptions: if a module fails, we continue onto the next one
+            try:
+                # Special case: this is a sublist, we run all the modules in the list in parallel
+                if type(mod) == type(list()):
+                    self.generic_call(mod) # TODO: launch each submodule in parallel (using subprocess or threading, but be careful: Python's threads aren't efficient so this is not useful at all, and subprocess creates a new object, so how to communicate the computed/returned variables efficiently in memory?)
+                else:
+                    # Unpacking the dict
+                    module = mod.keys()[0]
+                    func = mod.values()[0]
+                    # Get the class method
+                    fullfunc = getattr(self.__dict__[module], func)
+                    # Call the specified function for the specified module
+                    self.updatevars(fullfunc(**self.vars))
+                    #self.updatevars(self.learningalgo.learn(**self.vars))
+                    # dans learningalgo faire un if self.config.config['bigdata'] self.learn_bulk() or self.learn_bigdata()
+                    #eg: return {'X': df, 'Y': something, etc..}
+            except Exception, e:
+                print str(e)
+
+        return True
+
     ## Train the system to learn how to detect cheating
-    def learn(self):
-        if not self.config.config['bigdata']:
-            self.updatevars(self.inputparser.load())
+    def learn(self, executelist=None):
+        # We can pass an execution list either as an argument (used for recursion) or in the configuration
+        if not executelist:
+            executelist = self.config.config.get('run_learn', None)
+
+        # Execute all modules of run_learn
+        if executelist:
+            self.generic_call(executelist)
+
+        # Else we execute the standard learning routine
         else:
-            self.updatevars(self.inputparser.read())
-        self.updatevars(self.learningalgo.learn(**self.vars))
-        # dans learningalgo faire un if self.config.config['bigdata'] self.learn_bulk() or self.learn_bigdata()
-        #eg: return {'X': df, 'Y': something, etc..}
+            # Special case: for the input parser, we call the read method if we are in bigdata mode
+            if not self.config.config.get('bigdata'):
+                self.updatevars(self.inputparser.load())
+            else:
+                self.updatevars(self.inputparser.read())
+
         return True
 
     ## Update the local dict vars of variables
@@ -96,12 +131,22 @@ class Runner:
         self.vars.update(dict) # add new variables from dict and merge updated values for already existing variables
 
     ## Main/Prediction loop
-    def run(self):
-        oacs.configparser
-        oacs.learn
-        while 1:
-            oacs.inputparser # ou plutot on charge d'abord le input parser, et apres on fait InputParser.read()
-            oacs.predict
+    def run(self, executelist=None):
+        # We can pass an execution list either as an argument (used for recursion) or in the configuration
+        if not executelist:
+            executelist = self.config.config.get('run', None)
+
+        # Execute all modules of run_learn
+        if executelist:
+            self.generic_call(executelist)
+
+        # Else we execute the standard learning routine
+        else:
+            oacs.configparser
+            oacs.learn
+            while 1:
+                oacs.inputparser # ou plutot on charge d'abord le input parser, et apres on fait InputParser.read()
+                oacs.predict
 
         return True
 

@@ -1,4 +1,6 @@
 {
+    "run": [{"inputparser": "load"}, {"learningalgo": "learn"}, ["crossval1", "crossval2 en threading"], "postaction"],
+    "run_learn": [{"inputparser": "load"}],
     "classes": {
         "inputparser": "InterframeParser"
         },
@@ -10,13 +12,18 @@
     "optimization": {
         "post": {
             "crossval": {
-                "variables": [
-                    "X",
-                    "Y",
-                    "Theta",
-                    "Lambda",
-                    "K"
-                    ]
+                "variables": {
+                    "Theta": [0.1, 0.2, 0.3],
+                    "Lambda": "xrange(1,10)",
+                    "K": "xrange(1,6)",
+                    "T": {
+                        "min": 0,
+                        "max": 10,
+                        "func": "lambda x: -log(x)",
+                        "type": "pas de type! float pas de int - pour dichotomy"
+                        }
+                    },
+                "costfunc": "01Cost"
                 }
             }
         }
