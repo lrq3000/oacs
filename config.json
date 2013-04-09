@@ -3,7 +3,7 @@
     "run_learn": [{"inputparser": "load"}, {"classifier": "learn"}],
     "classes": {
         "inputparser": "InterframeParser",
-        "classifier": "BaseClassifier"
+        "classifier": "UnivariateGaussian"
         },
     "help":"hihi",
     "test":"a test value",
