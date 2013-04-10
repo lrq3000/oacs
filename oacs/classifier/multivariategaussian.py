@@ -5,7 +5,7 @@
 #
 # Multivariate gaussian AIS (Artificial Immune System) classifier.
 
-from oacs.base import BaseClass
+from oacs.classifier.univariategaussian import UnivariateGaussian
 import random
 import numpy as np
 import pandas as pd
@@ -15,7 +15,7 @@ from numpy import pi, exp
 #
 # Multivariate gaussian AIS (Artificial Immune System) classifier class, this will return a set of parameters: a vector of means Mu, and a covariance matrix Sigma2
 # This AIS classifier can catch any correlation between any feature
-class MultivariateGaussian(BaseClass):
+class MultivariateGaussian(UnivariateGaussian):
 
     ## @var config
     # An instance of the ConfigParser object, already loaded
@@ -23,7 +23,7 @@ class MultivariateGaussian(BaseClass):
     ## Constructor
     # @param config An instance of the ConfigParser class
     def __init__(self, config, *args, **kwargs):
-        return BaseClass.__init__(self, config, *args, **kwargs)
+        return UnivariateGaussian.__init__(self, config, *args, **kwargs)
 
     ## Learn the parameters from a given set X of examples, and labels Y
     # @param X Samples set
@@ -62,12 +62,8 @@ class MultivariateGaussian(BaseClass):
     ## Compute the weighted mean of the dataset
     # @param X Samples dataset
     # @param weights Vector/Series of weights (ie: number of times one sample has to be repeated) - default: X['framerepeat']
-    # TODO: bigdata iteration version (detect generator?)
     def mean(self, X, weights=None):
-        if weights is None: weights = X['framerepeat']
-        mean = np.average(X, axis=0, weights=weights)
-        mean = pd.Series(mean, index=list(X.keys()))
-        return mean
+        return UnivariateGaussian.mean(self, X, weights)
 
     ## Compute the weighted covariance matrix of the dataset
     # Alternative to pandas.DataFrame.cov(), because pandas's and numpy's cov() can't account for weights (if you set mean = X.mean(), then you'll get the exact same result as X.cov())

@@ -10,6 +10,7 @@
     "test2":"N",
     "datafile":"data.txt",
     "typesfile":"types.txt",
+    "parametersfile":"parameters.txt",
     "optimization": {
         "post": {
             "crossval": {
