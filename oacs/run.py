@@ -4,8 +4,13 @@
 from auxlib import *
 from oacs.configparser import ConfigParser
 import os, StringIO
-import json
 import pandas as pd
+
+json = import_module('ujson')
+if json is None:
+    json = import_module('json')
+    if json is None:
+        raise RuntimeError('Unable to find a json implementation')
 
 class Runner:
 
