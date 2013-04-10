@@ -23,6 +23,7 @@ class Runner:
     # @param args recognized and processed commandline arguments
     # @param extras extra commandline arguments that are not explicitly recognized (but will nevertheless be appended to the config file, so that you can overwrite pretty much any configuration parameter you want at commandline)
     def init(self, args, extras):
+        self.vars = dict()
         #-- Loading config
         self.config = ConfigParser()
         configfile = args['config']; del args['config'] # delete the config argument, which is at best a self reference

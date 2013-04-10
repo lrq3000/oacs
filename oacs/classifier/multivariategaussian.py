@@ -63,7 +63,7 @@ class MultivariateGaussian(UnivariateGaussian):
     # @param X Samples dataset
     # @param weights Vector/Series of weights (ie: number of times one sample has to be repeated) - default: X['framerepeat']
     def mean(self, X, weights=None):
-        return UnivariateGaussian.mean(self, X, weights)
+        return UnivariateGaussian.mean(X, weights)
 
     ## Compute the weighted covariance matrix of the dataset
     # Alternative to pandas.DataFrame.cov(), because pandas's and numpy's cov() can't account for weights (if you set mean = X.mean(), then you'll get the exact same result as X.cov())

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # encoding: utf-8
 
-## @package base
+## @package baseparser
 #
 # This contains the base parser class to be used as a template for other parsers
 

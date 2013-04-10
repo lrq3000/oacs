@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # encoding: utf-8
 
-## @package base
+## @package baseclassifier
 #
 # This contains the base classifier class to be used as a template for other classifiers
 

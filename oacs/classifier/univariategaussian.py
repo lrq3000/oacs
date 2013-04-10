@@ -30,8 +30,8 @@ class UnivariateGaussian(BaseClass):
     def learn(self, X=None, Y=None, *args, **kwargs):
         Yt = Y[Y==0].dropna() # get the list of non-anomalous examples
         Xt = X.irow(Yt.index) # filter out anomalous examples and keep only non-anomalous ones
-        Mu = self.mean(Xt, Xt['framerepeat']) # Mean
-        Sigma2 = self.variance(Xt, Mu, Xt['framerepeat']) # Vector of variances or Covariance matrix
+        Mu = UnivariateGaussian.mean(Xt, Xt['framerepeat']) # Mean
+        Sigma2 = UnivariateGaussian.variance(Xt, Mu, Xt['framerepeat']) # Vector of variances or Covariance matrix
         return {'Mu': Mu, 'Sigma2': Sigma2} # always return a dict of variables
 
     ## Univariate gaussian prediction of the probability/class of an example given a set of parameters (weighted mean and vector of standard deviations)
@@ -52,7 +52,8 @@ class UnivariateGaussian(BaseClass):
     # @param X Samples dataset
     # @param weights Vector/Series of weights (ie: number of times one sample has to be repeated) - default: X['framerepeat']
     # TODO: bigdata iteration version (detect generator?)
-    def mean(self, X, weights=None):
+    @staticmethod
+    def mean(X, weights=None):
         if weights is None: weights = X['framerepeat']
         mean = np.average(X, axis=0, weights=weights)
         mean = pd.Series(mean, index=list(X.keys()))
@@ -61,7 +62,8 @@ class UnivariateGaussian(BaseClass):
     ## Alternative way to compute the weighted mean of the dataset without using Numpy (ends up being slower)
     # @param X Samples dataset
     # @param weights Vector/Series of weights (ie: number of times one sample has to be repeated) - default: X['framerepeat']
-    def mean_alt(self, X, weights=None):
+    @staticmethod
+    def mean_alt(X, weights=None):
         def applyweight(serie):
             if weights is not None:
                 weight = serie[weights]
@@ -83,7 +85,8 @@ class UnivariateGaussian(BaseClass):
     # @param mean Weighted mean
     # @param weights Vector/Series of weights (ie: number of times one sample has to be repeated) - default: X['framerepeat']
     # TODO: bigdata iteration version (detect generator?)
-    def variance(self, X, mean, weights=None):
+    @staticmethod
+    def variance(X, mean, weights=None):
         if weights is None: weights = X['framerepeat']
         squareddiff = (X-mean)**2
         variance = squareddiff.T.dot(weights) / (weights.sum()-1) # DataFrames and Series are implicitly aligned by index
@@ -94,7 +97,8 @@ class UnivariateGaussian(BaseClass):
     # @param X Samples dataset
     # @param mean Weighted mean
     # @param weights Vector/Series of weights (ie: number of times one sample has to be repeated) - default: X['framerepeat']
-    def variance_alt(self, X, mean, weights=None):
+    @staticmethod
+    def variance_alt(X, mean, weights=None):
         if weights is None: weights = X['framerepeat']
         variance = np.dot(weights.tolist(), ((X-mean.tolist())**2))/ (weights.sum()-1)  # Fast and numerically precise
         #sigma = np.sqrt(variance)
