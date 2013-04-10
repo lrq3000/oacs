@@ -107,9 +107,9 @@ class Runner:
     # @param method Method to call in the object(s) (as string)
     def generic_call(self, obj, method):
         # If we have a list of modules to call, we call the method of each and every one of those modules
-        if type(obj) == type(list()):
+        if type(obj) == type(dict()):
             # For every module in the list
-            for submodule in obj:
+            for submodule in obj.itervalues():
                 # Get the callable object's method
                 fullfunc = getattr(submodule, method)
                 # Call the specified function for the specified module
