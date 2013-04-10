@@ -45,8 +45,9 @@ class Runner:
                 modlist = os.listdir(os.path.join(self.rootdir, submod)) # loading the list of files/submodules
                 modlist = list(set([os.path.splitext(mod)[0] for mod in modlist])) # strip out the extension + get only unique values (else we will get .py and .pyc filenames, which are in fact the same module)
                 # Trim out the base class and __init__
-                if 'base' in modlist:
-                    modlist.remove('base')
+                # Remove all base modules (modules whose names starts with 'base')
+                [modlist.remove(mod) for mod in modlist if mod.startswith('base')]
+                # Remove all __init__ modules (these are only used by the python interpreter)
                 if '__init__' in modlist:
                     modlist.remove('__init__')
 
