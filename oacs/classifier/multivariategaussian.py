@@ -57,7 +57,7 @@ class MultivariateGaussian(UnivariateGaussian):
         xm = xm.fillna(0) # if we have one NA, the whole result of all values will be NA
         Pred = (2*pi)**(-n/2) * np.linalg.det(Sigma2)**0.5 * exp(-0.5 * xm.T.dot(np.linalg.pinv(Sigma2)).dot(xm))
 
-        return {'Pred': Pred} # return the class of the sample(s)
+        return {'Prediction': Pred} # return the class of the sample(s)
 
     ## Compute the weighted mean of the dataset
     # @param X Samples dataset

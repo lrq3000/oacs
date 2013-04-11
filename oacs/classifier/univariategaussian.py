@@ -46,7 +46,7 @@ class UnivariateGaussian(BaseClassifier):
         # Compute the product of all probabilities (p1 = proba of feature 1 being normal; p1*p2*p3*...*pn)
         Pred = Pred.prod()
 
-        return {'Pred': Pred} # return the class of the sample(s)
+        return {'Prediction': Pred} # return the class of the sample(s)
 
     ## Compute the weighted mean of the dataset
     # @param X Samples dataset
