@@ -25,6 +25,7 @@ class BaseDetector(BaseClass):
     # Note: you can either directly work with X and call the functions by yourself, or you can call them in run executelist and then get the Prediction info
     # @param X Generator yielding one sample at a time. When exhausted, the loop should wait a bit, and then retry to check if X now contains more samples to check.
     # @param Prediction A scalar or a vector of predictions (preferably probabilities, but you are free to do whatever you want, as long as you manage the predictions values properly in your detector)
+    # @return DictOfVars Should at least return a dict of variables containing 'Cheater' and if possible 'Playerinfo' with extended player informations identifying the player. It is advised that this method also write down the result of each positive (cheater) detection in a file.
     def detect(self, X=None, Prediction=None, *args, **kwargs):
         # Assign a random value to Prediction if none is set
         if not Prediction:
