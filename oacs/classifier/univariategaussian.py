@@ -5,7 +5,7 @@
 #
 # Univariate gaussian AIS (Artificial Immune System) classifier.
 
-from oacs.base import BaseClass
+from oacs.classifier.baseclassifier import BaseClassifier
 import random
 import numpy as np
 import pandas as pd
@@ -14,7 +14,7 @@ from numpy import pi, exp
 ## UnivariateGaussian
 #
 # Univariate gaussian AIS (Artificial Immune System) classifier class, this will return a set of parameters: a vector of means Mu, and a vector of variances Sigma2 for each feature
-class UnivariateGaussian(BaseClass):
+class UnivariateGaussian(BaseClassifier):
 
     ## @var config
     # An instance of the ConfigParser object, already loaded
@@ -22,7 +22,7 @@ class UnivariateGaussian(BaseClass):
     ## Constructor
     # @param config An instance of the ConfigParser class
     def __init__(self, config, *args, **kwargs):
-        return BaseClass.__init__(self, config, *args, **kwargs)
+        return BaseClassifier.__init__(self, config, *args, **kwargs)
 
     ## Learn the parameters from a given set X of examples, and labels Y
     # @param X Samples set

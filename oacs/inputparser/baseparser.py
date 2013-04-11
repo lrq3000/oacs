@@ -43,6 +43,7 @@ class BaseParser(BaseClass):
         return content
 
     ## Read a file one line by one line (generator)
+    # NOTICE: this method must both return a generator reading one line at a time (to use in a for loop), and also be able to continue when it is exhausted (track new lines being added to the file at the next for loop)
     # @param file Path to the input file to read (optional)
     def read(self, file=None, *args, **kwargs):
         # If the input file was not specified, we use the config

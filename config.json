@@ -1,14 +1,11 @@
 {
-    "run": [{"inputparser": "load"}, {"classifier": "learn"}, ["crossval1", "crossval2 en threading"], "postaction"],
+    "run": [{"inputparser": "load"}, {"classifier": "learn"}, ["crossval1", "crossval2 en threading"], {"postaction": "action"}],
     "run_learn": [{"inputparser": "load"}, {"preoptimization": "optimize"}, {"classifier": "learn"}],
     "classes": {
         "inputparser": "InterframeParser",
         "preoptimization": "WeightedFeaturesNormalization",
         "classifier": "UnivariateGaussian"
         },
-    "help":"hihi",
-    "test":"a test value",
-    "test2":"N",
     "datafile":"data.txt",
     "typesfile":"types.txt",
     "parametersfile":"parameters.txt",
