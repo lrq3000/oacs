@@ -4,11 +4,13 @@
     "classes": {
         "inputparser": "InterframeParser",
         "preoptimization": "WeightedFeaturesNormalization",
-        "classifier": "UnivariateGaussian"
+        "classifier": "UnivariateGaussian",
+        "postaction": "RunCommand"
         },
     "datafile":"data.txt",
     "typesfile":"types.txt",
     "parametersfile":"parameters.txt",
+    "runcommand":"crcon -P 27960 --type=q3a --password='testpass' localhost \"say $playername is cheating\"",
     "optimization": {
         "post": {
             "crossval": {

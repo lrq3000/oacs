@@ -28,15 +28,16 @@ class RunCommand(BasePostAction):
         cmdlist = self.config.config.get('runcommand', None)
         # If this module is enabled but there's no command, quit
         if cmdlist is None: return None
-        # If in fact we have only one command, we convert it to a list of one element
-        if type(cmdlist) == type(str):
+        # If in fact we have a string (only one command) instead of a list, we convert it to a list of one element
+        if isinstance(cmdlist, basestring):
             cmdlist = [cmdlist]
         # Add the variables inside Playerinfo dict as variables themselves
-        kwargs = kwargs.extend(Playerinfo)
+        if Playerinfo:
+            kwargs.update(Playerinfo)
         # For each command
         for cmd in cmdlist:
             # For each available variable
-            for key, value in kwargs.iteritems:
+            for key, value in kwargs.iteritems():
                 # Try to replace the variable by its value if it's in the command
                 try:
                     cmd = cmd.replace("$%s" % key, str(value)) # replace all occurences of the variable key/name by its value (string representation of the value)
