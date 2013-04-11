@@ -1,16 +1,17 @@
 {
-    "run": [{"inputparser": "load"}, {"classifier": "learn"}, ["crossval1", "crossval2 en threading"], {"postaction": "action"}],
+    "run": [{"inputparser": "read_last"}, {"classifier": "predict"}, {"detector": "detect"}, {"postaction": "action"}],
     "run_learn": [{"inputparser": "load"}, {"preoptimization": "optimize"}, {"classifier": "learn"}],
     "classes": {
         "inputparser": "InterframeParser",
         "preoptimization": "WeightedFeaturesNormalization",
-        "classifier": "UnivariateGaussian",
+        "classifier": "BaseClassifier",
+        "detector": "BaseDetector",
         "postaction": "RunCommand"
         },
     "datafile":"data.txt",
     "typesfile":"types.txt",
     "parametersfile":"parameters.txt",
-    "runcommand":"crcon -P 27960 --type=q3a --password='testpass' localhost \"say $playername is cheating\"",
+    "runcommand":"crcon -P 27960 --type=q3a --password='testpass' localhost \"say ^1CHEAT DETECTED: $playername is cheating!\"",
     "optimization": {
         "post": {
             "crossval": {

@@ -105,6 +105,9 @@ class InterframeParser(BaseParser):
         for (X, Y) in itertools.izip_longest(genX, genY, fillvalue=None):
             yield {'X':X, 'Y':Y} # must always return a dict of variables
 
+    def read_last(self, file=None, raw=False, chunks_size=1, *args, **kwargs):
+        yield self.read(file=file, raw=raw, chunks_size=chunks_size, *args, **kwargs)
+
     ## Reset the cursor position to 0 (read the file back from the beginning)
     def resetpos(self, *args, **kwargs):
         BaseParser.resetpos(self, *args, **kwargs)

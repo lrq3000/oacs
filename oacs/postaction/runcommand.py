@@ -23,9 +23,12 @@ class RunCommand(BasePostAction):
         return BasePostAction.__init__(self, config, *args, **kwargs)
 
     ## Run a command
+    # @param Cheater Is the player a cheater?
     # @param Playerinfo A dict containing the info of the last detected cheater
     # @param **kwargs(Any_Variable) Any other variable passed in argument will be substituted by its string representation
-    def action(self, Playerinfo=None, debug=False, *args, **kwargs):
+    def action(self, Cheater=False, Playerinfo=None, debug=False, *args, **kwargs):
+        # If player is not a cheater, we quit
+        if not Cheater: return None
         # Get the list of commands to run
         cmdlist = self.config.config.get('runcommand', None)
         # If this module is enabled but there's no command, quit

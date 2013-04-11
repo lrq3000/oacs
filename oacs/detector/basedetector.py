@@ -31,7 +31,7 @@ class BaseDetector(BaseClass):
         if not Prediction:
             Prediction = random.uniform(0.0,1.0)
         # Random threshold for detection
-        if Prediction*Prediction < 0.1:
+        if Prediction*random.uniform(0.0,1.0) < 0.05:
             cheater = True # the player is a cheater!
         else:
             cheater = False # the player is not a cheater

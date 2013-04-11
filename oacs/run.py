@@ -5,6 +5,7 @@ from auxlib import *
 from oacs.configparser import ConfigParser
 import os, StringIO
 import pandas as pd
+import time
 
 json = import_module('ujson')
 if json is None:
@@ -98,7 +99,7 @@ class Runner:
         # Else, it may be a list or an object or just a scalar (this means the function is not conforming to the dev standards), then can't know where to put those results and we just memorize them inside a "lastout" entry as-is.
         else:
             # Delete the previous output
-            if self.vars["lastout"]: del self.vars["lastout"]
+            if self.vars.get("lastout", None): del self.vars["lastout"]
             # Save this output
             self.vars.update({"lastout": dictofvars})
 
@@ -254,7 +255,9 @@ class Runner:
 
         # Execute all modules of run_learn
         if executelist:
-            self.execute(executelist)
+            while 1:
+                self.execute(executelist)
+                time.sleep(self.config.config.get('run_sleep', 1))
 
         # Else we execute the standard learning routine
         else:
