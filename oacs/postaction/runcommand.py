@@ -7,6 +7,8 @@
 
 from oacs.postaction.basepostaction import BasePostAction
 
+from subprocess import call
+
 ## RunCommand
 #
 # Run a generic command with variable substitution (you can access any scalar variable from Runner)
@@ -23,7 +25,7 @@ class RunCommand(BasePostAction):
     ## Run a command
     # @param Playerinfo A dict containing the info of the last detected cheater
     # @param **kwargs(Any_Variable) Any other variable passed in argument will be substituted by its string representation
-    def action(self, Playerinfo=None, *args, **kwargs):
+    def action(self, Playerinfo=None, debug=False, *args, **kwargs):
         # Get the list of commands to run
         cmdlist = self.config.config.get('runcommand', None)
         # If this module is enabled but there's no command, quit
@@ -46,7 +48,8 @@ class RunCommand(BasePostAction):
                     print(e)
                     pass
             # Execute the command
-            print(cmd)
-            #os.execute(cmd)
+            if debug: # also print it if debug
+                print(cmd)
+            return_code = call(cmd, shell=True)
 
         return True
