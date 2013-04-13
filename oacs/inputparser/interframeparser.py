@@ -11,6 +11,9 @@ from oacs.auxlib import *
 import os
 import itertools
 
+import time
+import StringIO
+
 import pandas as pd
 
 ## InterframeParser
@@ -39,6 +42,7 @@ class InterframeParser(BaseParser):
     ## Constructor
     # @param config An instance of the ConfigParser class
     def __init__(self, config, *args, **kwargs):
+        self.cursorpos = 0
         return BaseParser.__init__(self, config, *args, **kwargs)
 
     ## Load the whole content of a file containing interframes in CSV format and return pandas's DataFrames
@@ -47,10 +51,13 @@ class InterframeParser(BaseParser):
     def load(self, file=None, raw=False, *args, **kwargs):
         # If the input files were given in parameter, we update the config
         if file and (type(file) == type(list)) and len(file) == 2:
-            self.config.config['typesfile'] = file[0]
-            self.config.config['datafile'] = file[1]
+            typesfile = file[0]
+            datafile = file[1]
+        else:
+            typesfile = self.config.config['typesfile']
+            datafile = self.config.config['datafile']
 
-        self.types = pd.read_csv(self.config.config['typesfile'], index_col=None, header=0) # squeeze=True does not work for row-oriented csv as of current pandas version!
+        self.types = pd.read_csv(typesfile, index_col=None, header=0) # squeeze=True does not work for row-oriented csv as of current pandas version!
         self.types = self.types.ix[0, :] # convert to a pandas Series
 
         # If we want raw data, we do not filter any column
@@ -61,7 +68,7 @@ class InterframeParser(BaseParser):
             filtertypes = self.types[~self.types.isin(self.featureTypeFilter.values())].keys() # get the list of columns we want to keep in the Data
 
         # Read the Data file in chunks of 1000 lines (to avoid a too big memory footprint)
-        data = pd.read_csv(self.config.config['datafile'], iterator=True, chunksize=1000, usecols=filtertypes)
+        data = pd.read_csv(datafile, iterator=True, chunksize=1000, usecols=filtertypes)
         X = pd.concat([chunk for chunk in data], ignore_index=True)
 
         # Extracting labels
@@ -74,17 +81,20 @@ class InterframeParser(BaseParser):
     ## Read interframes from a CSV file one-line-by-one and return pandas's Series (this is a generator)
     # @param file List of 2 elements, being the paths to the input types file and the input data file (in this order)
     # @param raw Return raw dataframe, without any column filtering
-    def read(self, file=None, raw=False, chunks_size=1, *args, **kwargs):
+    def read_alt(self, file=None, raw=False, chunks_size=1, *args, **kwargs):
         # If the input files were given in parameter, we update the config
         if file and (type(file) == type(list)) and len(file) == 2:
-            self.config.config['typesfile'] = file[0]
-            self.config.config['datafile'] = file[1]
+            typesfile = file[0]
+            datafile = file[1]
+        else:
+            typesfile = self.config.config['typesfile']
+            datafile = self.config.config['datafile']
 
         # Check that variables values are possible
         if chunks_size < 1:
             chunks_size = 1
 
-        self.types = pd.read_csv(self.config.config['typesfile'], index_col=None, header=0) # squeeze=True does not work for row-oriented csv as of current pandas version!
+        self.types = pd.read_csv(typesfile, index_col=None, header=0) # squeeze=True does not work for row-oriented csv as of current pandas version!
         self.types = self.types.ix[0, :] # convert to a pandas Series
 
         # If we want raw data, we do not filter any column
@@ -95,23 +105,92 @@ class InterframeParser(BaseParser):
             filtertypes = self.types[~self.types.isin(self.featureTypeFilter.values() + self.featureTypeLabel.values())].keys() # get the list of columns we want to keep in the Data # z = dict(x); z.update(y);
 
         # Read the Data file in chunks of 1000 lines (to avoid a too big memory footprint)
-        genX = pd.read_csv(self.config.config['datafile'], iterator=True, chunksize=chunks_size, usecols=filtertypes)
+        genX = pd.read_csv(datafile, iterator=True, chunksize=chunks_size, usecols=filtertypes)
 
         # Extracting labels
         labels = self.types[self.types.isin(self.featureTypeLabel.values())].keys() # extracting all the column labels
-        genY = pd.read_csv(self.config.config['datafile'], iterator=True, chunksize=chunks_size, usecols=labels)
+        genY = pd.read_csv(datafile, iterator=True, chunksize=chunks_size, usecols=labels)
 
         # Return the values of X and Y from the generators, and we fill the shortest list by None when we reach its end (but normally, we expect X and Y to have the same number of samples)
         for (X, Y) in itertools.izip_longest(genX, genY, fillvalue=None):
             yield {'X':X, 'Y':Y} # must always return a dict of variables
 
-    def read_last(self, file=None, raw=False, chunks_size=1, *args, **kwargs):
-        yield self.read(file=file, raw=raw, chunks_size=chunks_size, *args, **kwargs)
+    def read(self, file=None, raw=False, skip_to_end=False, *args, **kwargs):
+        # If the input files were given in parameter, we update the config
+        if file and (type(file) == type(list)) and len(file) == 2:
+            typesfile = file[0]
+            datafile = file[1]
+        else:
+            typesfile = self.config.config['typesfile']
+            datafile = self.config.config['datafile']
+
+        # Skip to the end of the file (avoid redetecting the same samples)
+        if skip_to_end and not self.getpos():
+            self.setpos(pos='end', file=datafile)
+            self.cursorpos = self.getpos()
+        elif self.getpos() is None:
+            self.setpos(0)
+
+        # Read the types file to get metadata (columns names and columns types)
+        self.types = pd.read_csv(typesfile, index_col=None, header=0) # squeeze=True does not work for row-oriented csv as of current pandas version!
+        self.types = self.types.ix[0, :] # convert to a pandas Series
+
+        # If we want raw data, we do not filter any column
+        if raw:
+            filtertypes = None
+        # Else we filter out columns that are useless for learning
+        else:
+            filtertypes = self.types[~self.types.isin(self.featureTypeFilter.values())].keys() # get the list of columns we want to keep in the Data
+
+        with open(datafile, 'rb') as f:
+
+            # Set reading cursor position to the latest line not yet read
+            f.seek(self.getpos(), 0)
+
+            # try to read one line
+            if not f.readline(): # nothing new to read? then return None and wait until next iteration
+                return
+
+            # Else we have new lines to read, then read on!
+
+            # Reset cursor position
+            f.seek(self.getpos(), 0)
+
+            for line in f:
+
+                linein = StringIO.StringIO(line)
+
+                # Convert to a pandas Series
+                X = pd.read_csv(linein, index_col=None, header=None)
+                X = X.transpose()[0]
+
+                # If this is the header line (with the columns names), we just skip it because we already have the columns names using the types file
+                if isinstance(X[0], basestring): continue
+
+                # Set the columns names
+                X.index = self.types.index
+                # Filter out colums we don't want
+                X = X[filtertypes]
+
+                # Extracting labels
+                labels = self.types[self.types.isin(self.featureTypeLabel.values())].keys() # extracting all the column labels
+                Y = X[labels]
+
+                # Return a dict of generators
+                yield {'X':X, 'Y':Y}
+
+            # Save the latest cursor position
+            self.setpos(pos=f.tell())
+
+
+    ## Get the current position in the file
+    def getpos(self, *args, **kwargs):
+        return self.cursorpos
 
     ## Reset the cursor position to 0 (read the file back from the beginning)
     def resetpos(self, *args, **kwargs):
         BaseParser.resetpos(self, *args, **kwargs)
 
     ## Set the cursor position to read the file from a specified byte
-    def setpos(self, pos=0, *args, **kwargs):
-        BaseParser.setpos(self, pos, *args, **kwargs)
+    def setpos(self, *args, **kwargs):
+        BaseParser.setpos(self, *args, **kwargs)

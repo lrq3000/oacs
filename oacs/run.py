@@ -106,7 +106,10 @@ class Runner:
     ## Generically call one object and its method (if obj is a list, it will call the method of each and every one of the modules in the list)
     # @param obj Object or list of objects
     # @param method Method to call in the object(s) (as string)
-    def generic_call(self, obj, method):
+    # @param args Optional arguments to pass to the method
+    def generic_call(self, obj, method, args=None):
+        if args is None:
+            args = {}
         # If we have a list of modules to call, we call the method of each and every one of those modules
         if type(obj) == type(dict()):
             # For every module in the list
@@ -114,7 +117,7 @@ class Runner:
                 # Get the callable object's method
                 fullfunc = getattr(submodule, method)
                 # Call the specified function for the specified module
-                self.updatevars(fullfunc(**self.vars))
+                self.updatevars(fullfunc(**args.update(self.vars)))
         # Else if it is an object, we directly call its method
         else:
             # Get the callable object's method
@@ -225,17 +228,24 @@ class Runner:
         if not executelist:
             executelist = self.config.config.get('run_learn', None)
 
-        # Execute all modules of run_learn
-        if executelist:
-            self.execute(executelist)
+        # Standard learning routine
+        # If no routine is given, then we execute the standard learning routine
+        if not executelist:
+            executelist = []
+            if self.__dict__.get('preoptimization', None):
+                executelist.append({"preoptimization": "optimize"})
+            executelist.append({"classifier": "learn"})
+            if self.__dict__.get('postoptimization', None):
+                executelist.append({"postoptimization": "optimize"})
 
-        # Else we execute the standard learning routine
-        else:
-            # Special case: for the input parser, we call the read method if we are in bigdata mode
-            if not self.config.config.get('bigdata'):
-                self.generic_call(self.inputparser, 'load')
-            else:
-                self.generic_call(self.inputparser, 'read')
+        # Load the data prior to the execution of the learning routine
+        if not self.config.config.get('bigdata'):
+            self.generic_call(self.inputparser, 'load')
+        else: # Special case: for the input parser, we call the read method if we are in bigdata mode
+            self.updatevars({'X': self.inputparser.read()}) # we put the generator of variables in X
+
+        # Execute all modules of the routine (either of config['run_learn'] or the standard routine)
+        self.execute(executelist)
 
         # End of learning, we save the parameters if a parametersfile was specified
         if self.config.config.get('parametersfile', None):
@@ -253,19 +263,37 @@ class Runner:
         if not executelist:
             executelist = self.config.config.get('run', None)
 
-        # Execute all modules of run_learn
-        if executelist:
-            while 1:
-                self.execute(executelist)
-                time.sleep(self.config.config.get('run_sleep', 1))
+        # Standard detection routine
+        # If no routine is given, then we execute the standard detection routine
+        if not executelist:
+            executelist = []
+            if self.__dict__.get('postoptimization', None):
+                executelist.append({"postoptimization": "optimize"})
+            executelist.append({"classifier": "predict"})
+            executelist.append({"detector": "detect"})
+            if self.__dict__.get('postaction', None):
+                executelist.append({"postaction": "action"})
 
-        # Else we execute the standard learning routine
-        else:
-            oacs.configparser
-            oacs.learn
-            while 1:
-                oacs.inputparser # ou plutot on charge d'abord le input parser, et apres on fait InputParser.read()
-                oacs.predict
+        # Main loop
+        while 1:
+            # Set the reading cursor at the end of the file (last line)
+            skip_to_end = True
+            if not self.config.config.get('simulatedetection', None):
+                skip_to_end=False
+            # Get the samples generator
+            gen = self.inputparser.read(skip_to_end=True)
+            # For each samples in the generator
+            for dictofvars in gen:
+                # No new lines yet? We just wait for the next iteration after having slept a bit
+                if dictofvars is None: break
+                # Add them to the global list of variables
+                self.updatevars(dictofvars)
+                # Execute all modules of the routine (either of config['run'] or the standard routine)
+                self.execute(executelist)
+                # Sleep a bit between each sample to give the hand to other processes
+                time.sleep(self.config.config.get('run_minisleep', 0.01))
+            # Sleep a bit between each batch of new samples (here we finished the last batch and reached the end of file, wait a bit because anyway there won't be any new sample ASAP)
+            time.sleep(self.config.config.get('run_sleep', 1))
 
         return True
 

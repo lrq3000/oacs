@@ -7,6 +7,7 @@
 
 from oacs.base import BaseClass
 import os
+import numbers
 
 ## BaseParser
 #
@@ -22,6 +23,7 @@ class BaseParser(BaseClass):
     ## Constructor
     # @param config An instance of the ConfigParser class
     def __init__(self, config, *args, **kwargs):
+        self.cursorpos = 0
         return BaseClass.__init__(self, config, *args, **kwargs)
 
     ## Load the whole content of a file and return it
@@ -50,9 +52,6 @@ class BaseParser(BaseClass):
         if not file:
             file = self.config.config["inputfile"]
 
-        if not hasattr(self, 'cursorpos'):
-            self.cursorpos = 0
-
         # open in binary mode to avoid line returns translation (else the reading will be flawed!). We have to do it both at saving and at reading.
         with open(file, 'rb') as f:
             # Getting the stats of the game log (we are looking for the size)
@@ -60,26 +59,38 @@ class BaseParser(BaseClass):
             # Compare the current cursor position against the current file size,
             # if the cursor is at a number higher than the game log size, then
             # there's a problem
-            if self.cursorpos > filestats.st_size:
+            if self.getpos() > filestats.st_size:
                 print('%s: Input file is suddenly smaller than it was before (%s bytes, now %s), the file was probably either rotated or emptied. The application will now re-adjust to the new size of the file (read back from the beginning).' % (self.__class__.__name__, str(f.tell()), str(filestats.st_size)) )
                 f.seek(0, os.SEEK_END)
                 self.resetpos()
             # Else we continue where we were reading the last time we opened the file
             else:
-                f.seek(self.cursorpos, 0) # absolute seeking: position to the beginning of the row
+                f.seek(self.getpos(), 0) # absolute seeking: position to the beginning of the row
 
             # Read all lines until there are no more
             for line in f:
                 yield line
 
             # store the last cursor position (for the next time we will open the file again, so that we can continue at the same position)
-            self.cursorpos = f.tell()
+            self.setpos(f.tell())
+
+    ## Get the current position in the file
+    def getpos(self):
+        return self.cursorpos
 
     ## Reset the cursor position to 0 (read the file back from the beginning)
     def resetpos(self, *args, **kwargs):
         self.cursorpos = 0
 
     ## Set the cursor position to read the file from a specified byte
-    def setpos(self, pos=None, *args, **kwargs):
-        if pos >= 0:
+    # @param pos Position to set the reading cursor
+    # @param file File to use to set the cursor position (optional, only used for special pos, eg: pos='end')
+    def setpos(self, pos=None, file=None, *args, **kwargs):
+        if isinstance(pos, numbers.Number) and pos >= 0:
             self.cursorpos = pos
+        # Set the cursor at the end of the specified file
+        elif pos == 'end' and file:
+            self.cursorpos = os.path.getsize(file)
+            #with open(datafile, 'rb') as f:
+                #f.seek(0, OS.SEEK_END)
+                #self.cursorpos = f.tell()

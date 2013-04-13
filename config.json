@@ -4,14 +4,15 @@
     "classes": {
         "inputparser": "InterframeParser",
         "preoptimization": "WeightedFeaturesNormalization",
-        "classifier": "BaseClassifier",
+        "classifier": "UnivariateGaussian",
         "detector": "BaseDetector",
         "postaction": "RunCommand"
         },
-    "datafile":"data.txt",
+    "datafile":"data-short.txt",
     "typesfile":"types.txt",
     "parametersfile":"parameters.txt",
     "runcommand":"crcon -P 27960 --type=q3a --password='testpass' localhost \"say ^1CHEAT DETECTED: $playername is cheating!\"",
+    "bigdata": false,
     "optimization": {
         "post": {
             "crossval": {
