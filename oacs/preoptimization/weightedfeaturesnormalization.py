@@ -19,7 +19,7 @@ class WeightedFeaturesNormalization(BasePreOptimization):
 
     ## Constructor
     # @param config An instance of the ConfigParser class
-    def __init__(self, config, *args, **kwargs):
+    def __init__(self, config=None, *args, **kwargs):
         return BasePreOptimization.__init__(self, config, *args, **kwargs)
 
     ## Normalize the X dataset into a normal distribution (mean = 0, variance = 1)

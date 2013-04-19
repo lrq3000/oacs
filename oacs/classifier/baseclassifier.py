@@ -14,12 +14,15 @@ import random
 class BaseClassifier(BaseClass):
 
     ## @var config
-    # An instance of the ConfigParser object, already loaded
+    # A reference to a ConfigParser object, already loaded
+
+    ## @var parent
+    # A reference to the parent object (Runner)
 
     ## Constructor
     # @param config An instance of the ConfigParser class
-    def __init__(self, config, *args, **kwargs):
-        return BaseClass.__init__(self, config, *args, **kwargs)
+    def __init__(self, config=None, parent=None, *args, **kwargs):
+        return BaseClass.__init__(self, config, parent, *args, **kwargs)
 
     ## Learn the parameters from a given set X of examples, and labels Y
     # @param X Samples set

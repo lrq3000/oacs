@@ -11,14 +11,19 @@
 class BaseClass(object):
 
     ## @var config
-    # An instance of the ConfigParser object, already loaded
+    # A reference to a ConfigParser object, already loaded
+
+    ## @var parent
+    # A reference to the parent object (Runner)
 
     ## Constructor
     # @param config An instance of the ConfigParser class
-    def __init__(self, config, *args, **kwargs):
+    def __init__(self, config=None, parent=None, *args, **kwargs):
         if not self.loadconfig(config):
-            print('CRITICAL ERROR : COULD NOT LOAD CONFIG')
+            print('CRITICAL ERROR : COULD NOT LOAD CONFIG IN CLASS %s' % self.__class__)
             raise SystemExit(220)
+        if parent:
+            self.parent = parent
         return object.__init__(self)
 
     ## Register the configuration to be directly accessible as a variable inside this object

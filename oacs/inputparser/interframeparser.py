@@ -41,7 +41,7 @@ class InterframeParser(BaseParser):
 
     ## Constructor
     # @param config An instance of the ConfigParser class
-    def __init__(self, config, *args, **kwargs):
+    def __init__(self, config=None, *args, **kwargs):
         self.cursorpos = 0
         return BaseParser.__init__(self, config, *args, **kwargs)
 

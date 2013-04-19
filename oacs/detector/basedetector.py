@@ -14,12 +14,15 @@ import random
 class BaseDetector(BaseClass):
 
     ## @var config
-    # An instance of the ConfigParser object, already loaded
+    # A reference to a ConfigParser object, already loaded
+
+    ## @var parent
+    # A reference to the parent object (Runner)
 
     ## Constructor
     # @param config An instance of the ConfigParser class
-    def __init__(self, config, *args, **kwargs):
-        return BaseClass.__init__(self, config, *args, **kwargs)
+    def __init__(self, config=None, parent=None, *args, **kwargs):
+        return BaseClass.__init__(self, config, parent, *args, **kwargs)
 
     ## Main loop to check if a player is honest or cheater
     # Note: you can either directly work with X and call the functions by yourself, or you can call them in run executelist and then get the Prediction info

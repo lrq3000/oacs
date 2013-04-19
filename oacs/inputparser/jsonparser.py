@@ -29,7 +29,7 @@ class JsonParser(BaseParser):
 
     ## Constructor
     # @param config An instance of the ConfigParser class
-    def __init__(self, config, *args, **kwargs):
+    def __init__(self, config=None, *args, **kwargs):
         return BaseParser.__init__(self, config, *args, **kwargs)
 
     ## Load the whole content of a file at once as JSON and return a Python object corresponding to the JSON tree

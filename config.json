@@ -1,6 +1,6 @@
 {
-    "run": [{"inputparser": "read_last"}, {"classifier": "predict"}, {"detector": "detect"}, {"postaction": "action"}],
-    "run_learn": [{"inputparser": "load"}, {"preoptimization": "optimize"}, {"classifier": "learn"}],
+    "run": [{"classifier": "predict"}, {"detector": "detect"}, {"postaction": "action"}],
+    "run_learn": [{"preoptimization": "optimize"}, {"classifier": "learn"}],
     "classes": {
         "inputparser": "InterframeParser",
         "preoptimization": "WeightedFeaturesNormalization",
@@ -8,7 +8,7 @@
         "detector": "BaseDetector",
         "postaction": "RunCommand"
         },
-    "datafile":"data-short.txt",
+    "datafile":"data.txt",
     "typesfile":"types.txt",
     "parametersfile":"parameters.txt",
     "runcommand":"crcon -P 27960 --type=q3a --password='testpass' localhost \"say ^1CHEAT DETECTED: $playername is cheating!\"",

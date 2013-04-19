@@ -22,7 +22,7 @@ class MultivariateGaussian(UnivariateGaussian):
 
     ## Constructor
     # @param config An instance of the ConfigParser class
-    def __init__(self, config, *args, **kwargs):
+    def __init__(self, config=None, *args, **kwargs):
         return UnivariateGaussian.__init__(self, config, *args, **kwargs)
 
     ## Learn the parameters from a given set X of examples, and labels Y

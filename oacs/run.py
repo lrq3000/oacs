@@ -77,9 +77,9 @@ class Runner:
         try:
             aclass = import_class('.'.join([self.rootdir, submod, classname.lower()]), classname)
             if listofclasses:
-                self.__dict__[submod][classname.lower()] = aclass(self.config)
+                self.__dict__[submod][classname.lower()] = aclass(config=self.config, parent=self)
             else:
-                self.__dict__[submod] = aclass(self.config)
+                self.__dict__[submod] = aclass(config=self.config, parent=self)
             return True
         except Exception, e:
             package_full = '.'.join([self.rootdir, submod, classname.lower()])
@@ -274,6 +274,10 @@ class Runner:
             if self.__dict__.get('postaction', None):
                 executelist.append({"postaction": "action"})
 
+        # Caching a few vars (faster than accessing methods)
+        run_minisleep = self.config.config.get('run_minisleep', 0.01)
+        run_sleep = self.config.config.get('run_sleep', 1)
+
         # Main loop
         while 1:
             # Set the reading cursor at the end of the file (last line)
@@ -291,9 +295,9 @@ class Runner:
                 # Execute all modules of the routine (either of config['run'] or the standard routine)
                 self.execute(executelist)
                 # Sleep a bit between each sample to give the hand to other processes
-                time.sleep(self.config.config.get('run_minisleep', 0.01))
+                time.sleep(run_minisleep)
             # Sleep a bit between each batch of new samples (here we finished the last batch and reached the end of file, wait a bit because anyway there won't be any new sample ASAP)
-            time.sleep(self.config.config.get('run_sleep', 1))
+            time.sleep(run_sleep)
 
         return True
 

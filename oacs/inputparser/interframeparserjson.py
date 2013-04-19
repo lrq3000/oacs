@@ -25,7 +25,7 @@ class InterframeParserJson(JsonParser):
 
     ## Constructor
     # @param config An instance of the ConfigParser class
-    def __init__(self, config, *args, **kwargs):
+    def __init__(self, config=None, *args, **kwargs):
         return JsonParser.__init__(self, config, *args, **kwargs)
 
     ## Load the whole content of a file containing interframes in JSON format and return pandas's DataFrames

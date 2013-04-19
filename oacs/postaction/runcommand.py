@@ -19,7 +19,7 @@ class RunCommand(BasePostAction):
 
     ## Constructor
     # @param config An instance of the ConfigParser class
-    def __init__(self, config, *args, **kwargs):
+    def __init__(self, config=None, *args, **kwargs):
         return BasePostAction.__init__(self, config, *args, **kwargs)
 
     ## Run a command
