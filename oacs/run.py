@@ -6,6 +6,7 @@ from oacs.configparser import ConfigParser
 import os, StringIO
 import pandas as pd
 import time
+from collections import OrderedDict
 
 json = import_module('ujson')
 if json is None:
@@ -77,6 +78,7 @@ class Runner:
         try:
             aclass = import_class('.'.join([self.rootdir, submod, classname.lower()]), classname)
             if listofclasses:
+                if not self.__dict__[submod]: self.__dict__[submod] = OrderedDict() # keep the order in which the items were given (all iterators will also follow the order). This allows to set in config the order in which we want the items to be executed.
                 self.__dict__[submod][classname.lower()] = aclass(config=self.config, parent=self)
             else:
                 self.__dict__[submod] = aclass(config=self.config, parent=self)
@@ -111,7 +113,7 @@ class Runner:
         # Create the local dict of vars
         allvars = dict()
         # If we have a list of modules to call, we call the method of each and every one of those modules
-        if type(obj) == type(dict()):
+        if isinstance(obj, (dict, OrderedDict)):
             # For every module in the list
             for submodule in obj.itervalues():
                 # Update the local dict of vars
