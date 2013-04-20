@@ -6,11 +6,13 @@
         "preoptimization": "WeightedFeaturesNormalization",
         "classifier": "UnivariateGaussian",
         "detector": "BaseDetector",
-        "postaction": ["SimplePrint", "DetectionLog", "RunCommand"]
+        "postaction": ["PlayersTable", "SimplePrint", "DetectionLog", "RunCommand"]
         },
     "datafile":"data.txt",
     "typesfile":"types.txt",
     "parametersfile":"parameters.txt",
+    "playerstable":"playerstable.txt",
+    "detectionlogmsg":"$playername ($playerip $playerguid $playerid) was detected to be cheating at $datetime ($timestamp) with a probability of $Prediction",
     "runcommand":"crcon -P 27960 --type=q3a --password='testpass' localhost \"say ^1CHEAT DETECTED: $playername is cheating!\"",
     "bigdata": false,
     "optimization": {

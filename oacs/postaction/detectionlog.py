@@ -40,7 +40,7 @@ class DetectionLog(BasePostAction):
             kwargs.update(Playerinfo)
 
         # Load the template string to use for the lines
-        template = self.config.config.get('detectiontemplate', self.defaultmsg)
+        template = self.config.config.get('detectionlogmsg', self.defaultmsg)
 
         # Substitute all variables in our template
         # For each available variable
