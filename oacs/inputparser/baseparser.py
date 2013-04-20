@@ -41,7 +41,7 @@ class BaseParser(BaseClass):
             content = f.read()
             self.cursorpos = f.tell()
         except Exception, e:
-            print str(e)
+            print "Exception in %s while trying to load the file: %s" % (self.__class__, str(e))
             return False
         finally:
             f.close()

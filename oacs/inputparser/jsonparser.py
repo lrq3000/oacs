@@ -74,14 +74,9 @@ class JsonParser(BaseParser):
 
     ## Save a JSON construct, UNUSED
     def save(self, jsoncontent, jsonfile, *args, **kwargs):
-        try:
-            f = open(jsonfile, 'wb') # open in binary mode to avoid line returns translation (else the reading will be flawed!). We have to do it both at saving and at reading.
+        with open(jsonfile, 'wb') as f: # open in binary mode to avoid line returns translation (else the reading will be flawed!). We have to do it both at saving and at reading.
             f.write( json.dumps(jsoncontent, sort_keys=True, indent=4) ) # write the file as a json serialized string, but beautified to be more human readable
-            f.close()
-            return True
-        except Exception, e:
-            print e
-            return False
+        return True
 
     ## Reset the cursor position to 0 (read the file back from the beginning)
     def resetpos(self, *args, **kwargs):

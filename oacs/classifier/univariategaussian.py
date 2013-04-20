@@ -38,9 +38,9 @@ class UnivariateGaussian(BaseClassifier):
     # @param X One unknown example to label
     # @param Mu Weighted mean of X
     # @param Sigma2 Covariance matrix of X
-    def predict(self, x=None, Mu=None, Sigma2=None, *args, **kwargs):
+    def predict(self, X=None, Mu=None, Sigma2=None, *args, **kwargs):
         # Univariate gaussian density estimation
-        Pred = (1/(2*pi*Sigma2)**0.5) * exp(-(x-Mu)/(2*Sigma2))
+        Pred = (1/(2*pi*Sigma2)**0.5) * exp(-(X-Mu)/(2*Sigma2))
         if 'framerepeat' in Pred.keys():
             Pred = Pred.drop(['framerepeat'])
         # Compute the product of all probabilities (p1 = proba of feature 1 being normal; p1*p2*p3*...*pn)

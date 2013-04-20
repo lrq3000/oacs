@@ -67,11 +67,6 @@ class ConfigParser(object):
     ## Save the current configuration (with commandline arguments processed) into a file
     # @param file Path to where the configuration file should be saved
     def save(self, file, *args, **kwargs):
-        try:
-            f = open(file, 'wb') # open in binary mode to avoid line returns translation (else the reading will be flawed!). We have to do it both at saving and at reading.
+        with open(file, 'wb') as f: # open in binary mode to avoid line returns translation (else the reading will be flawed!). We have to do it both at saving and at reading.
             f.write( json.dumps(self.config, sort_keys=True, indent=4) ) # write the config as a json serialized string, but beautified to be more human readable
-            f.close()
-            return True
-        except Exception, e:
-            print str(e)
-            return False
+        return True

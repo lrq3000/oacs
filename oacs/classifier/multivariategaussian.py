@@ -40,9 +40,9 @@ class MultivariateGaussian(UnivariateGaussian):
     # @param Mu Weighted mean of X
     # @param Sigma2 Covariance matrix of X
     # TODO: compatibility with more than one sample (detect type==pdSseries)?
-    def predict(self, x=None, Mu=None, Sigma2=None, *args, **kwargs):
-        if 'framerepeat' in x:
-            x = x.drop(['framerepeat'])
+    def predict(self, X=None, Mu=None, Sigma2=None, *args, **kwargs):
+        if 'framerepeat' in X:
+            X = X.drop(['framerepeat'])
             Sigma2 = Sigma2.drop(['framerepeat'], axis=0) # drop in both axis
             Sigma2 = Sigma2.drop(['framerepeat'], axis=1)
             Mu = Mu.drop(['framerepeat'])
@@ -53,7 +53,7 @@ class MultivariateGaussian(UnivariateGaussian):
             Sigma2 = pd.DataFrame(Sigma2)
 
         n = len(Mu.keys()) #X.shape[0]
-        xm = x-Mu # X difference to the mean
+        xm = X-Mu # X difference to the mean
         xm = xm.fillna(0) # if we have one NA, the whole result of all values will be NA
         Pred = (2*pi)**(-n/2) * np.linalg.det(Sigma2)**0.5 * exp(-0.5 * xm.T.dot(np.linalg.pinv(Sigma2)).dot(xm))
 

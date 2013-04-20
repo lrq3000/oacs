@@ -7,6 +7,7 @@
 
 from oacs.base import BaseClass
 import random
+import pandas as pd
 
 ## BaseDetector
 #
@@ -29,7 +30,7 @@ class BaseDetector(BaseClass):
     # @param X Generator yielding one sample at a time. When exhausted, the loop should wait a bit, and then retry to check if X now contains more samples to check.
     # @param Prediction A scalar or a vector of predictions (preferably probabilities, but you are free to do whatever you want, as long as you manage the predictions values properly in your detector)
     # @return DictOfVars Should at least return a dict of variables containing 'Cheater' and if possible 'Playerinfo' with extended player informations identifying the player. It is advised that this method also write down the result of each positive (cheater) detection in a file.
-    def detect(self, X=None, Prediction=None, *args, **kwargs):
+    def detect(self, X=None, Prediction=None, X_raw=None, *args, **kwargs):
         # Assign a random value to Prediction if none is set
         if not Prediction:
             Prediction = random.uniform(0.0,1.0)
@@ -40,5 +41,6 @@ class BaseDetector(BaseClass):
             cheater = False # the player is not a cheater
         # We can return a Playerinfo dict with extended informations identifying the player for futher processing by postaction classes
         Playerinfo = {'cheater': cheater, 'playername': 'John Doe'}
+        if X_raw is not None and type(X_raw) == pd.Series: Playerinfo.update(X_raw.to_dict()) # add all the informations available in Playerinfo
         # Return the result
         return {'Cheater': cheater, 'Playerinfo': Playerinfo} # always return a dict of variables

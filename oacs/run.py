@@ -108,16 +108,19 @@ class Runner:
     # @param method Method to call in the object(s) (as string)
     # @param args Optional arguments to pass to the method
     def generic_call(self, obj, method, args=None):
-        if args is None:
-            args = {}
+        # Create the local dict of vars
+        allvars = dict()
         # If we have a list of modules to call, we call the method of each and every one of those modules
         if type(obj) == type(dict()):
             # For every module in the list
             for submodule in obj.itervalues():
+                # Update the local dict of vars
+                allvars.update(self.vars)
+                if args is not None and type(args) == dict: allvars.update(args)
                 # Get the callable object's method
                 fullfunc = getattr(submodule, method)
                 # Call the specified function for the specified module
-                self.updatevars(fullfunc(**args.update(self.vars)))
+                self.updatevars(fullfunc(**allvars))
         # Else if it is an object, we directly call its method
         else:
             # Get the callable object's method
@@ -131,21 +134,21 @@ class Runner:
         # Loop through all modules in run_learn list
         for mod in executelist:
             # Catch exceptions: if a module fails, we continue onto the next one
-            try:
-                # Special case: this is a sublist, we run all the modules in the list in parallel
-                if type(mod) == type(list()):
-                    self.generic_call(mod) # TODO: launch each submodule in parallel (using subprocess or threading, but be careful: Python's threads aren't efficient so this is not useful at all, and subprocess creates a new object, so how to communicate the computed/returned variables efficiently in memory?)
-                else:
-                    # Unpacking the dict
-                    module = mod.keys()[0]
-                    func = mod.values()[0]
+            #try:
+            # Special case: this is a sublist, we run all the modules in the list in parallel
+            if type(mod) == type(list()):
+                self.generic_call(mod) # TODO: launch each submodule in parallel (using subprocess or threading, but be careful: Python's threads aren't efficient so this is not useful at all, and subprocess creates a new object, so how to communicate the computed/returned variables efficiently in memory?)
+            else:
+                # Unpacking the dict
+                module = mod.keys()[0]
+                func = mod.values()[0]
 
-                    self.generic_call(self.__dict__[module], func)
-                    #self.updatevars(self.learningalgo.learn(**self.vars))
-                    # dans learningalgo faire un if self.config.config['bigdata'] self.learn_bulk() or self.learn_bigdata()
-                    #eg: return {'X': df, 'Y': something, etc..}
-            except Exception, e:
-                print str(e)
+                self.generic_call(self.__dict__[module], func)
+                #self.updatevars(self.learningalgo.learn(**self.vars))
+                # dans learningalgo faire un if self.config.config['bigdata'] self.learn_bulk() or self.learn_bigdata()
+                #eg: return {'X': df, 'Y': something, etc..}
+            #except Exception, e:
+                #print "Exception when executing the routine: %s" % str(e)
 
         return True
 
@@ -169,7 +172,7 @@ class Runner:
             # Else if it is not a pandas object, we save as-is
             except Exception, e:
                 finaldict[key] = item
-                print(e)
+                print("Exception: couldn't correctly convert the value for the key %s. Error: %s" % (key, e))
 
         # Save the dict of csv data as a JSON file
         try:
@@ -178,7 +181,7 @@ class Runner:
             f.close()
             return True
         except Exception, e:
-            print e
+            print("Exception while trying to save the parameters into the parameters file: %s" % e)
             return False
 
     ## Load the parameters from a file
@@ -217,7 +220,7 @@ class Runner:
             # If it didn't work well, we load the object as-is
             except Exception, e:
                 dictofvars[key] = item
-                print(e)
+                print("Exception: couldn't correctly load the value for the key %s. Error: %s" % (key, e))
 
         # Return the list of variables/parameters
         return dictofvars

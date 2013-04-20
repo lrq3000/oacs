@@ -158,6 +158,8 @@ class InterframeParser(BaseParser):
 
             for line in f:
 
+                if not line: break # if line is empty, just return None and end the generator
+
                 linein = StringIO.StringIO(line)
 
                 # Convert to a pandas Series
@@ -169,6 +171,10 @@ class InterframeParser(BaseParser):
 
                 # Set the columns names
                 X.index = self.types.index
+
+                # Copy the raw sample
+                X_raw = X
+
                 # Filter out colums we don't want
                 X = X[filtertypes]
 
@@ -177,10 +183,12 @@ class InterframeParser(BaseParser):
                 Y = X[labels]
 
                 # Return a dict of generators
-                yield {'X':X, 'Y':Y}
+                yield {'X':X, 'Y':Y, 'X_raw':X_raw}
 
             # Save the latest cursor position
             self.setpos(pos=f.tell())
+
+            return
 
 
     ## Get the current position in the file

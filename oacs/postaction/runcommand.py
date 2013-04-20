@@ -48,7 +48,7 @@ class RunCommand(BasePostAction):
                     cmd = cmd.replace("$%s" % key, str(value)) # replace all occurences of the variable key/name by its value (string representation of the value)
                 # Error, we just pass
                 except Exception, e:
-                    print(e)
+                    if debug: print(e)
                     pass
             # Execute the command
             if debug: # also print it if debug
