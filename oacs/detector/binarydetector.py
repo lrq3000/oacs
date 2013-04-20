@@ -5,9 +5,7 @@
 #
 # This contains the binary detector class which just flag cheaters when Prediction is above 0.5
 
-from oacs.base import BaseClass
-import random
-import pandas as pd
+from oacs.detector.basedetector import BaseDetector
 
 ## BinaryDetector
 #
