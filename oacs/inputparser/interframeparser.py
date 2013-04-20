@@ -79,9 +79,10 @@ class InterframeParser(BaseParser):
         return {'X':X, 'Y':Y} # must always return a dict of variables
 
     ## Read interframes from a CSV file one-line-by-one and return pandas's Series (this is a generator)
+    # Note: this implementation has no memory once it stops, so that you can't continue where you left last time (when you reached EOF)!
     # @param file List of 2 elements, being the paths to the input types file and the input data file (in this order)
     # @param raw Return raw dataframe, without any column filtering
-    def read_alt(self, file=None, raw=False, chunks_size=1, *args, **kwargs):
+    def __read_alt(self, file=None, raw=False, chunks_size=1, *args, **kwargs):
         # If the input files were given in parameter, we update the config
         if file and (type(file) == type(list)) and len(file) == 2:
             typesfile = file[0]
@@ -142,6 +143,7 @@ class InterframeParser(BaseParser):
         else:
             filtertypes = self.types[~self.types.isin(self.featureTypeFilter.values())].keys() # get the list of columns we want to keep in the Data
 
+        # Main loop to read the data from the file
         with open(datafile, 'rb') as f:
 
             # Set reading cursor position to the latest line not yet read
