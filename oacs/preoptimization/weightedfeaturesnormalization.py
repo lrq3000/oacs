@@ -35,7 +35,7 @@ class WeightedFeaturesNormalization(BasePreOptimization):
         if 'framerepeat' in X.keys():
             bak = X['framerepeat']
         # Compute the normalized dataset
-        X_std = (X - Mu) / Sigma2**0.5
+        X_std = (X - Mu) * (1.0/Sigma2**0.5) # TODO: Bug Pandas or Numpy: never do X / var, but X * (1.0/var) or X * var**-1, else if you divide, python will continue to run in the background and use 25 percent CPU! https://github.com/pydata/pandas/issues/3407
         # Put back the weights
         X_std['framerepeat'] = bak
         # Return the result

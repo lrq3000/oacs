@@ -88,8 +88,9 @@ class UnivariateGaussian(BaseClassifier):
     @staticmethod
     def variance(X, mean, weights=None):
         if weights is None: weights = X['framerepeat']
-        squareddiff = (X-mean)**2
-        variance = squareddiff.T.dot(weights) / (weights.sum()-1) # DataFrames and Series are implicitly aligned by index
+        squareddiff = X-mean
+        squareddiff = squareddiff * squareddiff # TODO: bug with Pandas/Numpy: if **2 produce this: https://github.com/pydata/pandas/issues/3407
+        variance = squareddiff.T.dot(weights) * ( 1.0 / (weights.sum()-1) ) # DataFrames and Series are implicitly aligned by index
         #sigma = variance ** 0.5
         return variance
 
