@@ -27,9 +27,9 @@ class BaseDetector(BaseClass):
 
     ## Main loop to check if a player is honest or cheater
     # Note: you can either directly work with X and call the functions by yourself, or you can call them in run executelist and then get the Prediction info
-    # @param X Generator yielding one sample at a time. When exhausted, the loop should wait a bit, and then retry to check if X now contains more samples to check.
+    # @param X Generator yielding one sample at a time.
     # @param Prediction A scalar or a vector of predictions (preferably probabilities, but you are free to do whatever you want, as long as you manage the predictions values properly in your detector)
-    # @return DictOfVars Should at least return a dict of variables containing 'Cheater' and if possible 'Playerinfo' with extended player informations identifying the player. It is advised that this method also write down the result of each positive (cheater) detection in a file.
+    # @return DictOfVars Should at least return a dict of variables containing 'Cheater' and if possible 'Playerinfo' with extended player informations identifying the player (you can call BaseDetector._makePlayerinfo() to do that). It is advised that this method also write down the result of each positive (cheater) detection in a file.
     def detect(self, X=None, Prediction=None, X_raw=None, *args, **kwargs):
         # Assign a random value to Prediction if none is set
         if not Prediction:
@@ -39,8 +39,16 @@ class BaseDetector(BaseClass):
             cheater = True # the player is a cheater!
         else:
             cheater = False # the player is not a cheater
-        # We can return a Playerinfo dict with extended informations identifying the player for futher processing by postaction classes
-        Playerinfo = {'cheater': cheater, 'playername': 'John Doe'}
-        if X_raw is not None and type(X_raw) == pd.Series: Playerinfo.update(X_raw.to_dict()) # add all the informations available in Playerinfo
+
+        # Make the Playerinfo (extended player's infos, necessary for postactions)
+        Playerinfo = self._makePlayerinfo(Cheater=cheater, X_raw=X_raw)
+
         # Return the result
         return {'Cheater': cheater, 'Playerinfo': Playerinfo} # always return a dict of variables
+
+    ## Make Playerinfo (extended player's infos, necessary for postactions)
+    def _makePlayerinfo(self, Cheater=None, X_raw=None, *args, **kwargs):
+        # We can return a Playerinfo dict with extended informations identifying the player for futher processing by postaction classes
+        Playerinfo = {'cheater': Cheater}
+        if X_raw is not None and type(X_raw) == pd.Series: Playerinfo.update(X_raw.to_dict()) # add all the informations available in Playerinfo
+        return Playerinfo
