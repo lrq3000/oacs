@@ -24,6 +24,8 @@ class BasePostAction(BaseClass):
         return BaseClass.__init__(self, config, parent, *args, **kwargs)
 
     ## Do an action
-    # @param Any variable
-    def action(self, *args, **kwargs):
+    # @param Cheater Is the player a cheater?
+    # @param Playerinfo A dict containing the info of the last detected cheater
+    # @param **kwargs(Any_Variable) Any other variable passed in argument will be substituted by its string representation
+    def action(self, Cheater=False, Playerinfo=None, *args, **kwargs):
         return True
