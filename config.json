@@ -1,13 +1,14 @@
 {
-    "run": [{"classifier": "predict"}, {"detector": "detect"}, {"postaction": "action"}],
+    "run": [{"classifier": "predict"}, {"decider": "decide"}, {"postaction": "action"}],
     "run_learn": [{"preoptimization": "optimize"}, {"classifier": "learn"}],
     "classes": {
         "inputparser": "InterframeParser",
         "preoptimization": "WeightedFeaturesNormalization",
         "classifier": "UnivariateGaussian",
-        "detector": "BaseDetector",
+        "decider": "BaseDecider",
         "postaction": ["Playerinfo", "PlayersTable", "SimplePrint", "DetectionLog", "RunCommand"]
         },
+    "debug": true,
     "datafile":"data.txt",
     "typesfile":"types.txt",
     "parametersfile":"parameters.txt",

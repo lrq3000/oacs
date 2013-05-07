@@ -39,4 +39,4 @@ class WeightedFeaturesNormalization(BasePreOptimization):
         # Put back the weights
         X_std['framerepeat'] = bak
         # Return the result
-        return {'X': X_std} # always return a dict of variables
+        return {'X': X_std} # always return a dict of variables if you want your variables saved durably and accessible later

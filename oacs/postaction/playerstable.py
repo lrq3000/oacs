@@ -50,8 +50,6 @@ class PlayersTable(BasePostAction):
         # Open the HDF store
         ptdb = pd.HDFStore('playerstabledb.h5')
 
-        print( 'playerid=%s' % str(int(Playerinfo['playerid'])) )
-
         # Fetch the record associated with the current player's playerid
         X = ptdb.select('playerstable', 'playerid=%s' % str(int(Playerinfo['playerid']))) # convert first to an int because sometimes pandas funnily add a .0 at the end to show that it is dtype float
 

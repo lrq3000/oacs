@@ -33,7 +33,7 @@ class MultivariateGaussian(UnivariateGaussian):
         Xt = X.iloc[Yt.index] # filter out anomalous examples and keep only non-anomalous ones
         Mu = self.mean(Xt, Xt['framerepeat']) # Mean
         Sigma2 = self.covar(Xt, Mu, 'framerepeat') # Vector of variances or Covariance matrix
-        return {'Mu': Mu, 'Sigma2': Sigma2} # always return a dict of variables
+        return {'Mu': Mu, 'Sigma2': Sigma2} # always return a dict of variables if you want your variables saved durably and accessible later
 
     ## Multivariate gaussian prediction of the probability/class of an example given a set of parameters (weighted mean and covariance matrix)
     # @param X One unknown example to label

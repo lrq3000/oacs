@@ -26,4 +26,4 @@ class BasePreOptimization(BaseClass):
     ## Optimize the dataset
     # @param X Samples set
     def optimize(self, X=None, *args, **kwargs):
-        return {'X': X} # always return a dict of variables
+        return {'X': X} # always return a dict of variables if you want your variables saved durably and accessible later

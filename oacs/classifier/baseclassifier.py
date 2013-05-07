@@ -29,7 +29,7 @@ class BaseClassifier(BaseClass):
     # @param Y Labels set (corresponding to X)
     def learn(self, X=None, Y=None, *args, **kwargs):
         Theta = [1]
-        return {'Theta': [1]} # always return a dict of variables
+        return {'Theta': [1]} # always return a dict of variables if you want your variables saved durably and accessible later
 
     ## Predict/Classify the probability/class of an example given a set of parameters
     # @param X One unknown example to label

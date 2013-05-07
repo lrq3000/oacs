@@ -32,7 +32,7 @@ class UnivariateGaussian(BaseClassifier):
         Xt = X.iloc[Yt.index] # filter out anomalous examples and keep only non-anomalous ones
         Mu = UnivariateGaussian.mean(Xt, Xt['framerepeat']) # Mean
         Sigma2 = UnivariateGaussian.variance(Xt, Mu, Xt['framerepeat']) # Vector of variances or Covariance matrix
-        return {'Mu': Mu, 'Sigma2': Sigma2} # always return a dict of variables
+        return {'Mu': Mu, 'Sigma2': Sigma2} # always return a dict of variables if you want your variables saved durably and accessible later
 
     ## Univariate gaussian prediction of the probability/class of an example given a set of parameters (weighted mean and vector of standard deviations)
     # @param X One unknown example to label

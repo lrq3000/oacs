@@ -99,6 +99,7 @@ class Runner:
         if type(dictofvars) == type(dict()):
             self.vars.update(dictofvars) # add new variables from dict and merge updated values for already existing variables
         # Else, it may be a list or an object or just a scalar (this means the function is not conforming to the dev standards), then can't know where to put those results and we just memorize them inside a "lastout" entry as-is.
+        # In summary: unnamed variables gets stored as temporary variables which may be overwritten at any time by subsequent functions
         else:
             # Delete the previous output
             if self.vars.get("lastout", None): del self.vars["lastout"]
@@ -275,7 +276,7 @@ class Runner:
             if self.__dict__.get('postoptimization', None):
                 executelist.append({"postoptimization": "optimize"})
             executelist.append({"classifier": "predict"})
-            executelist.append({"detector": "detect"})
+            executelist.append({"decider": "decide"})
             if self.__dict__.get('postaction', None):
                 executelist.append({"postaction": "action"})
 
