@@ -24,9 +24,7 @@ class SimplePrint(BasePostAction):
 
     ## Simply prints a message in the console whenever a positive detection of a cheater occurs
     # @param Cheater Is the player a cheater?
-    # @param Playerinfo A dict containing the info of the last detected cheater
-    # @param **kwargs(Any_Variable) Any other variable passed in argument will be substituted by its string representation
-    def action(self, Cheater=False, Playerinfo=None, debug=False, *args, **kwargs):
+    def action(self, Cheater=False, debug=False, *args, **kwargs):
         if Cheater: print("Cheater detected!")
 
         return True

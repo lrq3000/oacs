@@ -6,6 +6,7 @@
 # This contains the DetectionLog class to write down the positive detections in a log file
 
 from oacs.postaction.basepostaction import BasePostAction
+import numbers
 
 ## DetectionLog
 #
@@ -36,7 +37,7 @@ class DetectionLog(BasePostAction):
         detectionlog = self.config.config.get('detectionlog', 'detectionlog.txt')
 
         # Add the variables inside Playerinfo dict as variables themselves
-        if Playerinfo:
+        if Playerinfo is not None:
             kwargs.update(Playerinfo)
 
         # Load the template string to use for the lines
@@ -47,7 +48,13 @@ class DetectionLog(BasePostAction):
         for key, value in kwargs.iteritems():
             # Try to replace the variable by its value if it's in the command
             try:
-                template = template.replace("$%s" % key, str(value)) # replace all occurences of the variable key/name by its value (string representation of the value)
+                # Check first that it's a printable object
+                if isinstance(value, (int, long, float, complex, basestring, numbers.Number)):
+                    try: # try to convert to int if possible, but if it crashes, we just pass (eg: strings will make this crash)
+                        if (int(value) == value): value = int(value) # first try to convert the value to an int if it makes no difference (no info lost)
+                    except Exception, e:
+                        pass
+                    template = template.replace("$%s" % key, str(value)) # replace all occurences of the variable key/name by its value (string representation of the value)
             # Error, we just pass
             except Exception, e:
                 #print(e)

@@ -20,6 +20,9 @@ class PlayersTable(BasePostAction):
     ## @var parent
     # A reference to the parent object (Runner)
 
+    ## Maximum string size to store inside the HDF table (will cap ANY field, including player name but also numbers, so choose this number large enough!)
+    maxstringsize = 80
+
     ## Constructor
     # @param config An instance of the ConfigParser class
     def __init__(self, config=None, parent=None, *args, **kwargs):
@@ -37,18 +40,20 @@ class PlayersTable(BasePostAction):
 
         # If the player is a cheater, we fetch extended infos from the playerstable database
         if Cheater:
-            Playerinfo = self._updatePlayerinfo(Playerinfo)
+            Playerinfo.update(self._updatePlayerinfo(Playerinfo))
 
         return {'Playerinfo': Playerinfo} # return an updated dict of vars (mainly the Playerinfo, now containing extended informations)
 
-    def _updatePlayerinfo(self, Playerinfo):
-        if Playerinfo is None: Playerinfo = dict() # init Playerinfo if empty
+    def _updatePlayerinfo(self, Playerinfo=None):
+        if Playerinfo is None: return # if Playerinfo is empty, we cannot match the playerid thus we don't have to do anything and just return
 
         # Open the HDF store
         ptdb = pd.HDFStore('playerstabledb.h5')
 
+        print( 'playerid=%s' % str(int(Playerinfo['playerid'])) )
+
         # Fetch the record associated with the current player's playerid
-        X = ptdb.select('playerstable', 'playerid=%s' % str(Playerinfo['playerid']))
+        X = ptdb.select('playerstable', 'playerid=%s' % str(int(Playerinfo['playerid']))) # convert first to an int because sometimes pandas funnily add a .0 at the end to show that it is dtype float
 
         # if no player with this id can be found, we won't modify Playerinfo
         if not X.empty:
@@ -88,11 +93,20 @@ class PlayersTable(BasePostAction):
             X = dictofvars['X']
             # Convert to a one-row DataFrame because Pandas cannot yet store Series in HDF stores... And must also convert to dtype string! Int are not allowed!
             X = pd.DataFrame(X).transpose()
+            # WORKAROUND: since pandas 0.11 stable, astype("string") will cast a truncated representation string from a long number, thus we have to cast it correctly manually
+            #X.applymap(lambda x: "%.0f" % x if not isinstance(x, basestring) else x)
+            # Ensure that playername, which is set by the player, cannot break this code because it's too long (if longer than maxstringsize, the entry won't be stored at all!)
+            if 'playername' in X.keys():
+                X['playername'] = self._cap(X['playername'], self.maxstringsize)
             # Save into the database (will automatically create the database with the correct setup settings if the db file does not yet exist)
-            store.append('playerstable', X.astype("string"), data_columns=['playerid'], min_itemsize = 80, chunksize=1, expectedrows=1) # data_columns=True force all columns to be searchable (else you can't query playerid=someid, but just columns=playerid!). Here we only set playerid, because else the searchable data_columns are size limited, and if overflow then crash! And we certainly don't want that. So we have to skip playernames.
+            store.append('playerstable', X.astype("string"), data_columns=['playerid'], min_itemsize = self.maxstringsize, chunksize=1, expectedrows=1) # data_columns=True force all columns to be searchable (else you can't query playerid=someid, but just columns=playerid!). Here we only set playerid, because else the searchable data_columns are size limited, and if overflow then crash! And we certainly don't want that. So we have to skip playernames.
 
         # Close the HDF store
         store.close()
 
         # Everything went alright!
         return True
+
+    ## Cap a string to a maximum length
+    def _cap(self, string, length):
+        return string if len(string) <= length else string[0:length]

@@ -6,7 +6,7 @@
         "preoptimization": "WeightedFeaturesNormalization",
         "classifier": "UnivariateGaussian",
         "detector": "BaseDetector",
-        "postaction": ["PlayersTable", "SimplePrint", "DetectionLog", "RunCommand"]
+        "postaction": ["Playerinfo", "PlayersTable", "SimplePrint", "DetectionLog", "RunCommand"]
         },
     "datafile":"data.txt",
     "typesfile":"types.txt",

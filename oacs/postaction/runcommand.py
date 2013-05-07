@@ -37,7 +37,7 @@ class RunCommand(BasePostAction):
         if isinstance(cmdlist, basestring):
             cmdlist = [cmdlist]
         # Add the variables inside Playerinfo dict as variables themselves
-        if Playerinfo:
+        if Playerinfo is not None:
             kwargs.update(Playerinfo)
         # For each command
         for cmd in cmdlist:
@@ -45,7 +45,9 @@ class RunCommand(BasePostAction):
             for key, value in kwargs.iteritems():
                 # Try to replace the variable by its value if it's in the command
                 try:
-                    cmd = cmd.replace("$%s" % key, str(value)) # replace all occurences of the variable key/name by its value (string representation of the value)
+                    # Check first that it's a printable object
+                    if isinstance(value, (int, long, float, complex, basestring)):
+                        cmd = cmd.replace("$%s" % key, str(value)) # replace all occurences of the variable key/name by its value (string representation of the value)
                 # Error, we just pass
                 except Exception, e:
                     if debug: print(e)
