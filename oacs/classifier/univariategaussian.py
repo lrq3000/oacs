@@ -29,7 +29,7 @@ class UnivariateGaussian(BaseClassifier):
     # @param Y Labels set (corresponding to X)
     def learn(self, X=None, Y=None, *args, **kwargs):
         Yt = Y[Y==0].dropna() # get the list of non-anomalous examples
-        Xt = X.irow(Yt.index) # filter out anomalous examples and keep only non-anomalous ones
+        Xt = X.iloc[Yt.index] # filter out anomalous examples and keep only non-anomalous ones
         Mu = UnivariateGaussian.mean(Xt, Xt['framerepeat']) # Mean
         Sigma2 = UnivariateGaussian.variance(Xt, Mu, Xt['framerepeat']) # Vector of variances or Covariance matrix
         return {'Mu': Mu, 'Sigma2': Sigma2} # always return a dict of variables

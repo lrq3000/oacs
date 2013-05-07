@@ -33,11 +33,12 @@ class InterframeParser(BaseParser):
                                 #'FEATURE_GAMESPECIFIC': 2,				# Game-specific features (game rules)
                                 'FEATURE_PHYSICS': 3,                     # Physics limitation features (to avoid!!!)
                                 #'FEATURE_METADATA': 4,                 # Feature containing meta data about other features (like the framerepeat, which should be used as a ponderation factor for all the others features)
-                                #'FEATURE_LABEL': 5 # Not a feature, this is a label for the data
+                                #'FEATURE_METAINTERFRAME': 5,
+                                #'FEATURE_LABEL': 6 # Not a feature, this is a label for the data
                                 }
 
     # Which column(s) is/are the label(s) Y?
-    featureTypeLabel = {'FEATURE_LABEL': 5}
+    featureTypeLabel = {'FEATURE_LABEL': 6}
 
     ## Constructor
     # @param config An instance of the ConfigParser class

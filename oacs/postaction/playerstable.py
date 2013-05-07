@@ -53,7 +53,7 @@ class PlayersTable(BasePostAction):
         # if no player with this id can be found, we won't modify Playerinfo
         if not X.empty:
             # Select the last result (normally, the ids should be unique, but in case of conflict, the latest choice is the most reasonable since we just detected the cheating attempt)
-            X = X.irow(-1)
+            X = X.iloc[-1]
             # Update the Playerinfo with those extended informations
             Playerinfo.update(X.to_dict())
 
