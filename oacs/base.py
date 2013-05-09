@@ -18,6 +18,7 @@ class BaseClass(object):
 
     ## Constructor
     # @param config An instance of the ConfigParser class
+    # @param parent The parent class, so that a child class can access the parent class namespace (variables and methods) at any moment
     def __init__(self, config=None, parent=None, *args, **kwargs):
         if not self.loadconfig(config):
             print('CRITICAL ERROR : COULD NOT LOAD CONFIG IN CLASS %s' % self.__class__)
