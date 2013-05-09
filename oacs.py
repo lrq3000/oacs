@@ -16,7 +16,7 @@ import oacs.main
 ## Main entry point for the OACS program
 # @param argv A list of strings containing the arguments (optional)
 def main(argv=None):
-    oacs.main.main(argv)
+    return oacs.main.main(argv)
 
 if __name__ == '__main__':
     sys.exit(main())

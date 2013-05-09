@@ -31,15 +31,19 @@ def parse_cmdline_args(argv=None):
     parser.add_argument('--script', '-s', dest='script', action='store_true', default=False,
                         help='do not run the main loop, only load the constructs and config file, and then return a Runner instance so that you can use these constructs in whatever way you want using Python or Notebook.')
     parser.add_argument('--config', '-c', dest='config', action='store', default=None,
-                        help='specify a path to a specific configuration file you want to use')
-    parser.add_argument('--inputfile', '-i', dest='inputfile', action='store', default=None,
-                        help='input file')
-    parser.add_argument('--outputfile', '-o', dest='outputfile', action='store', default=None,
-                        help='output file (when --learn is set, the output file will contain the learned best parameters, else it will output the predicted cheaters list)')
-    parser.add_argument('--playerstable', '-p', dest='playerstable', action='store', default=None,
-                        help='file containing the players table (list of all players that connected). This is optional, but if set, the outputfile will contain extended identification informations (like ip and nickname instead of playerid) if set.')
+                        help='REQUIRED - specify a path to a specific configuration file you want to use')
+    parser.add_argument('--datafile', '-d', dest='datafile', action='store', default=None,
+                        help='REQUIRED - data file, where the data to be learned or detected resides (if --learn will learn the parameters from this file, else it will read from the end of the file and detect new anomalies)')
+    parser.add_argument('--typesfile', '-t', dest='typesfile', action='store', default=None,
+                        help='REQUIRED - types file, description file for the columns in datafile')
+    parser.add_argument('--parametersfile', '-p', dest='parametersfile', action='store',
+                        help='REQUIRED - parameters file, containing the best learned parameters (if --learn is set, the parametersfile will be written with the best learned parameters, else it will be read at detection to reload the parameters in memory)')
+    parser.add_argument('--playerstable', '-pt', dest='playerstable', action='store',
+                        help='file containing the players table (list of all players that connected to the server). Only for detection (useless if --learn). This is optional, but if set, the detectionlog will contain extended identification informations (like ip and nickname instead of playerid) if set.')
+    parser.add_argument('--detectionlog', '-dlog', dest='detectionlog', action='store',
+                        help='file where to write the history of all detections (only at detection, useless if --learn)')
     parser.add_argument('--learn', '-l', dest='learn', action='store_true', default=False,
-                        help='Train the system to learn how to detect cheating using the specified algorithm and input file.')
+                        help='Train the system to learn how to detect cheating using the specified algorithm and data file.')
 
 
 
@@ -75,14 +79,21 @@ def main(argv=None):
         runner.init(args, extras)
         return runner
     elif args['learn']:
+        print("OACS: Learning mode")
+        print("Initialization of the Runner module and all submodules specified in the config file %s..." % args['config'])
         runner = Runner()
         runner.init(args, extras)
-        runner.learn()
+        print("Learning the parameters from %s and saving in %s.\nPlease wait, this may take a while depending on how big your datafile is..." % (args['datafile'], args['parametersfile']))
+        return runner.learn()
     # Run the main OACS loop by default
     else:
+        print("OACS: Detection mode")
+        print("Initialization of the Runner module and all submodules specified in the config file %s..." % args['config'])
         runner = Runner()
         runner.init(args, extras)
-        runner.run()
+        print("OACS is running and actively detecting anomalies by watching the file %s\nPress CTRL+C to stop OACS at any moment." % args['datafile'])
+        return runner.run()
+
 
 if __name__ == '__main__':
-    main()
+    sys.exit(main())

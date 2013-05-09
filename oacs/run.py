@@ -362,24 +362,28 @@ class Runner:
 
         # Main loop
         while 1:
-            # Set the reading cursor at the end of the file (last line)
-            skip_to_end = True
-            if not self.config.config.get('simulatedetection', None):
-                skip_to_end=False
-            # Get the samples generator
-            gen = self.inputparser.read(skip_to_end=True)
-            # For each samples in the generator
-            for dictofvars in gen:
-                # No new lines yet? We just wait for the next iteration after having slept a bit
-                if dictofvars is None: break
-                # Add them to the global list of variables
-                self.updatevars(dictofvars)
-                # Execute all modules of the routine (either of config['run'] or the standard routine)
-                self.execute(executelist)
-                # Sleep a bit between each sample to give the hand to other processes
-                time.sleep(run_minisleep)
-            # Sleep a bit between each batch of new samples (here we finished the last batch and reached the end of file, wait a bit because anyway there won't be any new sample ASAP)
-            time.sleep(run_sleep)
+            try:
+                # Set the reading cursor at the end of the file (last line)
+                skip_to_end = True
+                if not self.config.config.get('simulatedetection', None):
+                    skip_to_end=False
+                # Get the samples generator
+                gen = self.inputparser.read(skip_to_end=True)
+                # For each samples in the generator
+                for dictofvars in gen:
+                    # No new lines yet? We just wait for the next iteration after having slept a bit
+                    if dictofvars is None: break
+                    # Add them to the global list of variables
+                    self.updatevars(dictofvars)
+                    # Execute all modules of the routine (either of config['run'] or the standard routine)
+                    self.execute(executelist)
+                    # Sleep a bit between each sample to give the hand to other processes
+                    time.sleep(run_minisleep)
+                # Sleep a bit between each batch of new samples (here we finished the last batch and reached the end of file, wait a bit because anyway there won't be any new sample ASAP)
+                time.sleep(run_sleep)
+            # Exit gracefully in case the user CTRL-C to stop the process
+            except KeyboardInterrupt:
+                return 0
 
         return True
 
