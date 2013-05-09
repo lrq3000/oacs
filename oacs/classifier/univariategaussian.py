@@ -6,10 +6,10 @@
 # Univariate gaussian AIS (Artificial Immune System) classifier.
 
 from oacs.classifier.baseclassifier import BaseClassifier
-import random
 import numpy as np
 import pandas as pd
 from numpy import pi, exp
+import numbers
 
 ## UnivariateGaussian
 #
@@ -39,12 +39,25 @@ class UnivariateGaussian(BaseClassifier):
     # @param Mu Weighted mean of X
     # @param Sigma2 Covariance matrix of X
     def predict(self, X=None, Mu=None, Sigma2=None, *args, **kwargs):
+        return UnivariateGaussian._predict(X=X, Mu=Mu, Sigma2=Sigma2)
+
+    ## Univariate gaussian prediction of the probability/class of an example given a set of parameters (weighted mean and vector of standard deviations)
+    # Note: we use a proxy method predict so that we can put this one as a staticmethod, and thus be called by other classes (since the code here is very generic)
+    # @param X One unknown example to label
+    # @param Mu Weighted mean of X
+    # @param Sigma2 Covariance matrix of X
+    @staticmethod
+    def _predict(X=None, Mu=None, Sigma2=None, *args, **kwargs):
         # Univariate gaussian density estimation
         Pred = (1/(2*pi*Sigma2)**0.5) * exp(-(X-Mu)/(2*Sigma2))
-        if 'framerepeat' in Pred.keys():
-            Pred = Pred.drop(['framerepeat'])
-        # Compute the product of all probabilities (p1 = proba of feature 1 being normal; p1*p2*p3*...*pn)
-        Pred = Pred.prod()
+
+        # If we were supplied only one feature, the prediction is then already a scalar and we don't have to do anything
+        # Else, it is a vector of likelihoods for each feature, and thus we compute the product
+        if not isinstance(Pred, numbers.Number):
+            if 'framerepeat' in Pred.keys():
+                Pred = Pred.drop(['framerepeat'])
+            # Compute the product of all probabilities (p1 = proba of feature 1 being normal; p1*p2*p3*...*pn)
+            Pred = Pred.prod()
 
         return {'Prediction': Pred} # return the class of the sample(s)
 

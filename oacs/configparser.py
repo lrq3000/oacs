@@ -64,6 +64,10 @@ class ConfigParser(object):
                     self.config[key.lstrip('-')] = True
                 i += 1
 
+    ## Reload the configuration file
+    def reload(self, *args, **kwargs):
+        self.load()
+
     ## Save the current configuration (with commandline arguments processed) into a file
     # @param file Path to where the configuration file should be saved
     def save(self, file, *args, **kwargs):

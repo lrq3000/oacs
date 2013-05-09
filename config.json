@@ -4,7 +4,7 @@
     "classes": {
         "inputparser": "InterframeParser",
         "preoptimization": "WeightedFeaturesNormalization",
-        "classifier": "UnivariateGaussian",
+        "classifier": "CANSGaussian",
         "decider": "BaseDecider",
         "postaction": ["Playerinfo", "PlayersTable", "SimplePrint", "DetectionLog", "RunCommand"]
         },
@@ -16,6 +16,8 @@
     "detectionlogmsg":"$playername ($playerip $playerguid $playerid) was detected to be cheating at $datetime ($timestamp) with a probability of $Prediction",
     "runcommand":"crcon -P 27960 --type=q3a --password='testpass' localhost \"say ^1CHEAT DETECTED: $playername is cheating!\"",
     "bigdata": false,
+    "cansgaussian_maxitemspercluster": 1,
+    "cansgaussian_mergeclusters": false,
     "optimization": {
         "post": {
             "crossval": {

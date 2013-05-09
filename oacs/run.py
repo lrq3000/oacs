@@ -160,22 +160,57 @@ class Runner:
     # TODO: replace by pandas.to_json() when the feature will be put back in the main branch?
     @staticmethod
     def save_vars(jsonfile, dictofvars, exclude=None):
-        finaldict = dict()
-
-        # For each object in our dict of variables
-        for key, item in dictofvars.iteritems():
-            # If this variable is in the exclude list, we skip it
-            if exclude and key in exclude:
-                continue
-            # Try to save the pandas object as CSV
-            try:
-                out = StringIO.StringIO()
-                item.to_csv(out)
-                finaldict[key] = out.getvalue()
-            # Else if it is not a pandas object, we save as-is
-            except Exception, e:
+        ## Simple function to insert an item in either a dict or a list
+        def addtolistordict(finaldict, key, item):
+            if isinstance(finaldict, (dict)):
                 finaldict[key] = item
-                print("Exception: couldn't correctly convert the value for the key %s. Error: %s" % (key, e))
+            elif isinstance(finaldict, (list, tuple)):
+                finaldict.insert(key, item)
+
+        ## Recursively convert variables into a json intelligible format
+        def convert_vars(dictofvars, exclude=None):
+            # Loading the correct generator depending on the type of dictofvars
+            # If it's a dict we iter over items
+            if (isinstance(dictofvars, dict)):
+                iter = dictofvars.iteritems()
+                finaldict = dict()
+            # If it's a list we enumerate it
+            elif (isinstance(dictofvars, (list, tuple))):
+                iter = enumerate(dictofvars)
+                finaldict = list()
+
+            # For each object in our dict of variables
+            for (key, item) in iter:
+                try:
+                    # If this variable is in the exclude list, we skip it
+                    if exclude and key in exclude:
+                            continue
+                # Try to save the pandas object as CSV
+                #try:
+                    # Only try if there is a method to_csv()
+                    # TODO: replace by pandas.to_json() when the feature will be put back in the main branch?
+                    if (hasattr(item, 'to_csv')):
+                        out = StringIO.StringIO()
+                        item.to_csv(out)
+                        addtolistordict(finaldict, key, out.getvalue())
+                    # Else it is probably not a Pandas object since this method is not available, we just save the value as-is or recursively convert pandas objects if possible
+                    else:
+                        # If this is a recursive object, try to convert the variables inside (they may be pandas objects)
+                        if (isinstance(item, (list, dict, tuple)) and not isinstance(item, basestring)):
+                            addtolistordict(finaldict, key, convert_vars(item))
+                        # Else just save the item as-is
+                        else:
+                            addtolistordict(finaldict, key, item)
+                # Else if it is not a pandas object, we save as-is
+                except Exception, e:
+                    addtolistordict(finaldict, key, item)
+                    print("Notice: couldn't correctly convert the value for the key %s. The value will be saved as-is. Error: %s" % (key, e))
+                    pass
+
+            return finaldict
+
+        # Convert recursively the dict of vars
+        finaldict = convert_vars(dictofvars, exclude)
 
         # Save the dict of csv data as a JSON file
         try:
@@ -184,7 +219,7 @@ class Runner:
             f.close()
             return True
         except Exception, e:
-            print("Exception while trying to save the parameters into the parameters file: %s" % e)
+            print("Exception while trying to save the parameters into the parameters file: %s. The parameters have not been saved!" % e)
             return False
 
     ## Load the parameters from a file
@@ -192,38 +227,79 @@ class Runner:
     # TODO: replace by pandas.from_json() when the feature will be put back in the main branch?
     @staticmethod
     def load_vars(jsonfile):
-        dictofvars = dict()
+        ## Simple function to insert an item in either a dict or a list
+        def addtolistordict(finaldict, key, item):
+            if isinstance(finaldict, (dict)):
+                finaldict[key] = item
+            elif isinstance(finaldict, (list, tuple)):
+                finaldict.insert(key, item)
+
+        ## Convert back variables and returns a dict
+        # This is mainly because we need to convert back pandas objects, because pandas does not provide a to_json() function anymore
+        # TODO: replace all this by a simple to_json() when it will be fixed in Pandas?
+        # @param d Can be either a dict or a list
+        def convert_vars(d):
+            # Loading the correct generator depending on the type of dictofvars
+            # If it's a dict we iter over items
+            if (isinstance(d, dict)):
+                iter = d.iteritems()
+                dictofvars = dict()
+            # If it's a list we enumerate it
+            elif (isinstance(d, (list, tuple))):
+                iter = enumerate(d)
+                dictofvars = list()
+
+            # For each item in the json
+            for key, item in iter:
+
+                # TODO: Pandas objects are stored in a string for the moment because to_json() was removed. Fix this with a more reliable way to decode those structures in the future.
+                if (isinstance(item, basestring)):
+                    # Try to load a pandas object (Series or DataFrame)
+                    try:
+                        buf = StringIO.StringIO(item)
+                        df = pd.read_csv(buf, index_col=0, header=0) # by default, load as a DataFrame
+                        # if in fact it's a Series (a vector), we reload as a Series
+                        # TODO: replace all this by pd.read_csv(buf, squeeze=True) when squeeze will work!
+                        if df.shape[1] == 1:
+                            buf.seek(0)
+                            addtolistordict(dictofvars, key, pd.Series.from_csv(buf))
+
+                            # Failsafe: in case we tried to load a Series but it didn't work well (pandas will failsafe and return the original string), we finally set as a DataFrame
+                            if (type(dictofvars[key]) != type(pd.Series()) and type(dictofvars[key]) != type(pd.DataFrame()) or dictofvars[key].dtype == object ): # if it's neither a Series nor DataFrame, we expect the item to be a DataFrame and not a Series
+                                addtolistordict(dictofvars, key, df)
+
+                        # Else if it is really a DataFrame, we set it as DataFrame
+                        else:
+                            if (not df.empty):
+                                addtolistordict(dictofvars, key, df)
+                            # In the case it is really a string (the resulting pandas object is empty), we just store the string as-is
+                            else:
+                                addtolistordict(dictofvars, key, item)
+
+                    # If it didn't work well, we load the object as-is (maybe it's simply a string)
+                    except Exception, e:
+                        addtolistordict(dictofvars, key, item)
+                        print("Exception: couldn't correctly load the value for the key %s. Error: %s. This item will be skipped." % (key, e))
+                        pass
+
+                # Else it is already a converted Python object (eg: a list, a dict, a number, etc...), we just use it as-is
+                else:
+                    if isinstance(item, (dict, list, tuple)) and not isinstance(item, basestring):
+                        addtolistordict(dictofvars, key, convert_vars(item))
+                    else:
+                        addtolistordict(dictofvars, key, item)
+
+            return dictofvars
+
+
         # Open the file
         with open(jsonfile, 'rb') as f:
             filecontent = f.read()
         # Load the json tree
         jsontree = json.loads(filecontent)
 
-        # For each item in the json
-        for key, item in jsontree.iteritems():
-
-            # Try to load a pandas object (Series or DataFrame)
-            try:
-                buf = StringIO.StringIO(item)
-                df = pd.read_csv(buf, index_col=0, header=0) # by default, load as a DataFrame
-                # if in fact it's a Series (a vector), we reload as a Series
-                # TODO: replace all this by pd.read_csv(buf, squeeze=True) when squeeze will work!
-                if df.shape[1] == 1:
-                    buf.seek(0)
-                    dictofvars[key] = pd.Series.from_csv(buf)
-
-                    # Failsafe: in case we tried to load a Series but it didn't work well (pandas will failsafe and return the original string), we finally set as a DataFrame
-                    if (type(dictofvars[key]) != type(pd.Series()) and type(dictofvars[key]) != type(pd.DataFrame()) or dictofvars[key].dtype == object ): # if it's neither a Series nor DataFrame, we expect the item to be a DataFrame and not a Series
-                        dictofvars[key] = df
-
-                # Else if it is really a DataFrame, we set it as DataFrame
-                else:
-                    dictofvars[key] = df
-
-            # If it didn't work well, we load the object as-is
-            except Exception, e:
-                dictofvars[key] = item
-                print("Exception: couldn't correctly load the value for the key %s. Error: %s" % (key, e))
+        # Convert recursively the dict of vars (for pandas objects)
+        dictofvars = convert_vars(jsontree)
 
         # Return the list of variables/parameters
         return dictofvars
@@ -255,7 +331,7 @@ class Runner:
 
         # End of learning, we save the parameters if a parametersfile was specified
         if self.config.config.get('parametersfile', None):
-            Runner.save_vars(self.config.config['parametersfile'], self.vars, ['X', 'Y']) # save all vars but X and Y (which may be VERY big and aren't parameters anyway)
+            Runner.save_vars(self.config.config['parametersfile'], self.vars, ['X', 'Y', 'X_raw']) # save all vars but X and Y (which may be VERY big and aren't parameters anyway)
 
         return True
 
