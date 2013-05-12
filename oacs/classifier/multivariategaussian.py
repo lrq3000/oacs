@@ -51,9 +51,14 @@ class MultivariateGaussian(UnivariateGaussian):
     @staticmethod
     def _predict(X=None, Mu=None, Sigma2=None, *args, **kwargs):
         if 'framerepeat' in X.keys():
-            X = X.drop(['framerepeat'], axis=1)
+            if type(X) == pd.Series:
+                X = X.drop(['framerepeat']) # axis will produce a bug with Series
+            else:
+                X = X.drop(['framerepeat'], axis=1)
+        if 'framerepeat' in Sigma2.keys():
             Sigma2 = Sigma2.drop(['framerepeat'], axis=0) # drop in both axis
             Sigma2 = Sigma2.drop(['framerepeat'], axis=1)
+        if 'framerepeat' in Mu.keys():
             Mu = Mu.drop(['framerepeat'])
 
         # if sigma2 is a vector, we convert it to a (covariance) matrix (filled with only values on the diagonal)
@@ -64,13 +69,13 @@ class MultivariateGaussian(UnivariateGaussian):
         n = len(Mu.keys()) #X.shape[0]
         xm = X-Mu # X difference to the mean
         xm = xm.fillna(0) # if we have one NA, the whole result of all values will be NA
-        T = xm.dot(np.linalg.pinv(Sigma2)) #debug
-        print T.shape #debug
-        print xm.T.shape #debug
         if type(X) == pd.Series:
             Pred = (2*pi)**(-n/2) * np.linalg.det(Sigma2)**0.5 * exp(-0.5 * xm.T.dot(np.linalg.pinv(Sigma2)).dot(xm))
         else:
-            Pred = (2*pi)**(-n/2) * np.linalg.det(Sigma2)**0.5 * exp(-0.5 * (xm.dot(np.linalg.pinv(Sigma2)) * xm).sum(axis=1))
+            T = xm.dot(np.linalg.pinv(Sigma2)) #debug
+            print T.shape #debug
+            print xm.T.shape #debug
+            Pred = (2*pi)**(-n/2) * np.linalg.det(Sigma2)**0.5 * exp(-0.5 * (xm.dot(np.linalg.pinv(Sigma2)) * xm).sum(axis=1)) # TODO: fix this, it does not work with more than one sample to test at a time
 
         return {'Prediction': Pred} # return the class of the sample(s)
 

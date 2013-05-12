@@ -118,7 +118,7 @@ class Runner:
         if return_vars: dictofvars = dict() # output dict of vars (if return_vars is True)
         # Append the optional arguments to pass to methods
         if args is not None and type(args) == dict:
-                    dictofvars.update(args)
+                    allvars.update(args)
         # If we have a list of modules to call, we call the method of each and every one of those modules
         if isinstance(obj, (dict, OrderedDict)):
             # For every module in the list

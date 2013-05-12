@@ -3,14 +3,14 @@
     "run_learn": [{"preoptimization": "optimize"}, {"classifier": "learn"}],
     "classes": {
         "inputparser": "InterframeParser",
-        "preoptimization": ["FillNaN", "DropEmptyFeatures", "WeightedFeaturesNormalization", "Winsorize"],
-        "classifier": "MultivariateGaussian",
+        "preoptimization": ["FillNaN", "DropEmptyFeatures", "Winsorize", "WeightedFeaturesNormalization"],
+        "classifier": "UnivariateGaussian",
         "decider": "BaseDecider",
         "postaction": ["Playerinfo", "PlayersTable", "SimplePrint", "DetectionLog", "RunCommand"]
         },
     "debug": false,
-    "datafile":"data.txt",
-    "typesfile":"types.txt",
+    "datafile":"data-test.txt",
+    "typesfile":"types-test.txt",
     "parametersfile":"parameters.txt",
     "playerstable":"playerstable.txt",
     "detectionlogmsg":"$playername ($playerip $playerguid $playerid) was detected to be cheating at $datetime ($timestamp) with a probability of $Prediction",
