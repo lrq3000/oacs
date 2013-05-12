@@ -26,16 +26,24 @@ class Winsorize(BasePreOptimization):
     ## Winsorizing the data to remove too extreme outliers values (equivalent of clipping in audio)
     # @param X Samples set
     # @param Rate Winsorizing rate (between 0 and 100), which is the percentage of data you want to keep (eg: for 90%, extreme values above 95 percentile or below 5 percentile will be clipped)
+    # @param winsorize_extreme_low At detection, you can reload the previously learnt parameter here
+    # @param winsorize_extreme_high At detection, you can reload the previously learnt parameter here
     # TODO: account for weights in scoreatpercentile, here it does not account
-    def optimize(self, X=None, Rate=90, *args, **kwargs):
+    def optimize(self, X=None, Rate=90, winsorize_extreme_low=None, winsorize_extreme_high=None, *args, **kwargs):
         # Compute the complement of the rate
         r = (100-Rate)/2
         # Set the weights
         weights = ['framerepeat']
 
         # Get the extreme values
-        extreme_low = pd.Series(scoreatpercentile(X, per=r, axis=0), index=X.columns)
-        extreme_high = pd.Series(scoreatpercentile(X, per=100-r, axis=0), index=X.columns)
+        if winsorize_extreme_low is not None and winsorize_extreme_high is not None:
+            # Reload the parameters at detection
+            extreme_low = winsorize_extreme_low
+            extreme_high = winsorize_extreme_high
+        else:
+            # Compute the percentiles at learning
+            extreme_low = pd.Series(scoreatpercentile(X, per=r, axis=0), index=X.columns)
+            extreme_high = pd.Series(scoreatpercentile(X, per=100-r, axis=0), index=X.columns)
 
         # Winsorize (clip) the extreme values
         for feature in X.columns: # For each feature, we will clip all extreme values in one go
@@ -46,4 +54,5 @@ class Winsorize(BasePreOptimization):
             # Clip extremely high values
             X.ix[X.ix[:,feature] > extreme_high[feature], feature] = extreme_high[feature]
 
-        return {'X':  X } # always return a dict of variables if you want your variables saved durably and accessible later
+        # Technique for detection: at learning, we save the winsorization parameter to reload them at detection (else we would have no way to find the parameters from only one sample at detection)
+        return {'X':  X, 'winsorize_extreme_low': extreme_low, 'winsorize_extreme_high': extreme_high } # always return a dict of variables if you want your variables saved durably and accessible later

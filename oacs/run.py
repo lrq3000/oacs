@@ -109,34 +109,50 @@ class Runner:
     ## Generically call one object and its method (if obj is a list, it will call the method of each and every one of the modules in the list)
     # @param obj Object or list of objects
     # @param method Method to call in the object(s) (as string)
-    # @param args Optional arguments to pass to the method
+    # @param args Optional arguments to pass to the method (must be a dictionary, with they keys being the name of the variables)
     # @param return_value Return a value instead of updating the local vars dict
+    # TODO: reduce the number of maintained dictionaries (there are 4: self.vars, allvars, dictofvars and args)
     def generic_call(self, obj, method, args=None, return_vars=False):
         # Create the local dict of vars
-        allvars = dict()
+        allvars = dict() # input dict of vars
+        if return_vars: dictofvars = dict() # output dict of vars (if return_vars is True)
+        # Append the optional arguments to pass to methods
+        if args is not None and type(args) == dict:
+                    dictofvars.update(args)
         # If we have a list of modules to call, we call the method of each and every one of those modules
         if isinstance(obj, (dict, OrderedDict)):
             # For every module in the list
             for submodule in obj.itervalues():
                 # Update the local dict of vars
                 allvars.update(self.vars)
-                if args is not None and type(args) == dict: allvars.update(args)
+                if return_vars: allvars.update(dictofvars)
                 # Get the callable object's method
                 fullfunc = getattr(submodule, method)
                 # Call the specified function for the specified module
                 if not return_vars:
+                    # By default we store in the local dict
                     self.updatevars(fullfunc(**allvars))
                 else:
-                    return fullfunc(**allvars)
-        # Else if it is an object, we directly call its method
+                    # Else we update a temporary dictofvars and we return it at the end
+                    dictofvars.update(fullfunc(**allvars))
+            # Return the dictofvars at the end of the loop if the user wants to return the variables to the caller instead of storing them locally
+            if return_vars:
+                allvars.update(dictofvars) # return the input vars updated with the outputvars
+                return allvars
+
+        # Else if it is an object (thus only one module to call), we directly call its method
         else:
             # Get the callable object's method
             fullfunc = getattr(obj, method)
+            # Update the local dict of vars
+            allvars.update(self.vars)
+            if return_vars: allvars.update(dictofvars)
             # Call the specified function for the specified module
             if not return_vars:
-                self.updatevars(fullfunc(**self.vars))
+                self.updatevars(fullfunc(**allvars))
             else:
-                return fullfunc(**self.vars)
+                allvars.update(fullfunc(**allvars)) # return the input vars updated with the outputvars
+                return allvars
 
     ## Generically call any module given a list of dicts containing {"submodule name": "method of the class to call"}
     # @param executelist A list containing the sequence of modules to launch (Note: the order of the contained elements matters!)
@@ -202,6 +218,9 @@ class Runner:
                         addtolistordict(finaldict, key, out.getvalue())
                     # Else it is probably not a Pandas object since this method is not available, we just save the value as-is or recursively convert pandas objects if possible
                     else:
+                        # If possible, try to convert the item to a list
+                        if (hasattr(item, 'tolist')):
+                            item = item.tolist()
                         # If this is a recursive object, try to convert the variables inside (they may be pandas objects)
                         if (isinstance(item, (list, dict, tuple)) and not isinstance(item, basestring)):
                             addtolistordict(finaldict, key, convert_vars(item))

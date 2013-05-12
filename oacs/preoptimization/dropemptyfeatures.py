@@ -24,11 +24,23 @@ class DropEmptyFeatures(BasePreOptimization):
 
     ## Drop empty features (which always have the same value, and result in variance=0)
     # @param X Samples set
-    def optimize(self, X=None, *args, **kwargs):
-        # Variance = 0 <=> sure that this feature is empty
-        emptykeys = X.columns[X.var() == 0] # equivalent to: X.columns[ (x == x.mean()).sum() == x.count() ] where we compare all values of a feature against its mean and see if at least one example has a different value
+    # @param Empty_features At detection, you can reload the previously learnt parameter here
+    def optimize(self, X=None, Empty_features=None, *args, **kwargs):
+        # Get the list of empty keys
+        if Empty_features:
+            # At detection, reuse the previously learnt list of empty features
+            emptykeys = Empty_features
+        else:
+            # At learning, compute to find the empty features
+            # Variance = 0 <=> sure that this feature is empty
+            emptykeys = X.columns[X.var() == 0].tolist() # equivalent to: X.columns[ (x == x.mean()).sum() == x.count() ] where we compare all values of a feature against its mean and see if at least one example has a different value
+
+        # Remove the empty features
         # If at least one feature is empty, we remove it
         if len(emptykeys) > 0:
-            X = X.drop(emptykeys, axis=1)
+            print("Dropping empty feature(s) column(s): %s" % emptykeys) # Notify the user that we are dropping a few keys
+            for key in emptykeys:
+                if key in X.columns:
+                    X = X.drop(key, axis=1) # Note: We could do it in one go with X = X.drop(emptykeys, axis=1) but it would fail if there were only a partial subset of the list of keys that are not yet removed and should be removed
 
-        return {'X':  X } # always return a dict of variables if you want your variables saved durably and accessible later
+        return {'X':  X, 'Empty_features': emptykeys } # always return a dict of variables if you want your variables saved durably and accessible later

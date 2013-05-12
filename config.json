@@ -8,7 +8,7 @@
         "decider": "BaseDecider",
         "postaction": ["Playerinfo", "PlayersTable", "SimplePrint", "DetectionLog", "RunCommand"]
         },
-    "debug": true,
+    "debug": false,
     "datafile":"data.txt",
     "typesfile":"types.txt",
     "parametersfile":"parameters.txt",

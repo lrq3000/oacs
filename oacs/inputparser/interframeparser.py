@@ -51,7 +51,7 @@ class InterframeParser(BaseParser):
     # @param raw Return raw dataframe, without any column filtering
     def load(self, file=None, raw=False, *args, **kwargs):
         # If the input files were given in parameter, we update the config
-        if file and (type(file) == type(list)) and len(file) == 2:
+        if file and (type(file) == list) and len(file) == 2:
             typesfile = file[0]
             datafile = file[1]
         else:

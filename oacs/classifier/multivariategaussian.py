@@ -50,8 +50,8 @@ class MultivariateGaussian(UnivariateGaussian):
     # TODO: compatibility with more than one sample (detect type==pdSseries)?
     @staticmethod
     def _predict(X=None, Mu=None, Sigma2=None, *args, **kwargs):
-        if 'framerepeat' in X:
-            X = X.drop(['framerepeat'])
+        if 'framerepeat' in X.keys():
+            X = X.drop(['framerepeat'], axis=1)
             Sigma2 = Sigma2.drop(['framerepeat'], axis=0) # drop in both axis
             Sigma2 = Sigma2.drop(['framerepeat'], axis=1)
             Mu = Mu.drop(['framerepeat'])
@@ -64,7 +64,13 @@ class MultivariateGaussian(UnivariateGaussian):
         n = len(Mu.keys()) #X.shape[0]
         xm = X-Mu # X difference to the mean
         xm = xm.fillna(0) # if we have one NA, the whole result of all values will be NA
-        Pred = (2*pi)**(-n/2) * np.linalg.det(Sigma2)**0.5 * exp(-0.5 * xm.T.dot(np.linalg.pinv(Sigma2)).dot(xm))
+        T = xm.dot(np.linalg.pinv(Sigma2)) #debug
+        print T.shape #debug
+        print xm.T.shape #debug
+        if type(X) == pd.Series:
+            Pred = (2*pi)**(-n/2) * np.linalg.det(Sigma2)**0.5 * exp(-0.5 * xm.T.dot(np.linalg.pinv(Sigma2)).dot(xm))
+        else:
+            Pred = (2*pi)**(-n/2) * np.linalg.det(Sigma2)**0.5 * exp(-0.5 * (xm.dot(np.linalg.pinv(Sigma2)) * xm).sum(axis=1))
 
         return {'Prediction': Pred} # return the class of the sample(s)
 
