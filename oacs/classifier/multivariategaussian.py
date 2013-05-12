@@ -95,6 +95,6 @@ class MultivariateGaussian(UnivariateGaussian):
             sigma2 = np.outer(xm.T, xm); # force matrix multiplication outer product (else if you use np.dot() or pandas.dot(), it will align by the indexes and make the dot product)
         else:
             m = X.shape[0]
-            sigma2 = 1./(m-1) * xm.T.dot(xm);
+            sigma2 = 1./(m-1) * xm.T.dot(xm); # Sigma2 = 1/m * X' * X
 
         return sigma2

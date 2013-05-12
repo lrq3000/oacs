@@ -110,7 +110,8 @@ class Runner:
     # @param obj Object or list of objects
     # @param method Method to call in the object(s) (as string)
     # @param args Optional arguments to pass to the method
-    def generic_call(self, obj, method, args=None):
+    # @param return_value Return a value instead of updating the local vars dict
+    def generic_call(self, obj, method, args=None, return_vars=False):
         # Create the local dict of vars
         allvars = dict()
         # If we have a list of modules to call, we call the method of each and every one of those modules
@@ -123,13 +124,19 @@ class Runner:
                 # Get the callable object's method
                 fullfunc = getattr(submodule, method)
                 # Call the specified function for the specified module
-                self.updatevars(fullfunc(**allvars))
+                if not return_vars:
+                    self.updatevars(fullfunc(**allvars))
+                else:
+                    return fullfunc(**allvars)
         # Else if it is an object, we directly call its method
         else:
             # Get the callable object's method
             fullfunc = getattr(obj, method)
             # Call the specified function for the specified module
-            self.updatevars(fullfunc(**self.vars))
+            if not return_vars:
+                self.updatevars(fullfunc(**self.vars))
+            else:
+                return fullfunc(**self.vars)
 
     ## Generically call any module given a list of dicts containing {"submodule name": "method of the class to call"}
     # @param executelist A list containing the sequence of modules to launch (Note: the order of the contained elements matters!)

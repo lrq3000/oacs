@@ -68,7 +68,7 @@ class UnivariateGaussian(BaseClassifier):
     @staticmethod
     def mean(X, weights=None):
         if weights is None: weights = X['framerepeat']
-        mean = np.average(X, axis=0, weights=weights)
+        mean = np.ma.average(X, axis=0, weights=weights)
         mean = pd.Series(mean, index=list(X.keys()))
         return mean
 
@@ -78,16 +78,16 @@ class UnivariateGaussian(BaseClassifier):
     @staticmethod
     def mean_alt(X, weights=None):
         def applyweight(serie):
-            if weights is not None:
-                weight = serie[weights]
-            else:
-                weight = serie['framerepeat']
+            weight = serie[weights]
             #s2 = serie.drop(['framerepeat'])
             s = serie * weight
-            s['framerepeat'] = weight
+            #s[weights] = weight
             return s
 
-        if 'framerepeat' in X.keys():
+        if weights is None:
+            weights = 'framerepeat'
+
+        if weights in X.keys():
             X = X.apply(applyweight, axis=1)
 
         mean = X.sum().astype(float) / X.ix[:,'framerepeat'].sum()

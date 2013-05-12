@@ -1,10 +1,10 @@
 {
-    "run": [{"classifier": "predict"}, {"decider": "decide"}, {"postaction": "action"}],
-    "run_learn": [{"preoptimization": "optimize"}, {"classifier": "learn"}],
+    "run": [{"preoptimization": "optimize"}, {"classifier": "predict"}, {"decider": "decide"}, {"postaction": "action"}],
+    "run_learn": [{"classifier": "learn"}],
     "classes": {
         "inputparser": "InterframeParser",
-        "preoptimization": "WeightedFeaturesNormalization",
-        "classifier": "CANSGaussian",
+        "preoptimization": ["FillNaN", "DropEmptyFeatures", "WeightedFeaturesNormalization"],
+        "classifier": "MultivariateGaussian",
         "decider": "BaseDecider",
         "postaction": ["Playerinfo", "PlayersTable", "SimplePrint", "DetectionLog", "RunCommand"]
         },
@@ -16,7 +16,7 @@
     "detectionlogmsg":"$playername ($playerip $playerguid $playerid) was detected to be cheating at $datetime ($timestamp) with a probability of $Prediction",
     "runcommand":"crcon -P 27960 --type=q3a --password='testpass' localhost \"say ^1CHEAT DETECTED: $playername is cheating!\"",
     "bigdata": false,
-    "cansgaussian_maxitemspercluster": 1,
+    "cansgaussian_maxitemspercluster": 4,
     "cansgaussian_mergeclusters": false,
     "optimization": {
         "post": {

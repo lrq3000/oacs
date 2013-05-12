@@ -32,8 +32,8 @@ class InterframeParser(BaseParser):
                                 #'FEATURE_HUMAN': 1,			# Human-specific features
                                 #'FEATURE_GAMESPECIFIC': 2,				# Game-specific features (game rules)
                                 'FEATURE_PHYSICS': 3,                     # Physics limitation features (to avoid!!!)
-                                #'FEATURE_METADATA': 4,                 # Feature containing meta data about other features (like the framerepeat, which should be used as a ponderation factor for all the others features)
-                                #'FEATURE_METAINTERFRAME': 5,
+                                'FEATURE_METADATA': 4,                 # Feature containing meta data about other features
+                                #'FEATURE_METAINTERFRAME': 5, # Meta data about the interframe (like the framerepeat, which should be used as a ponderation factor for all the others features)
                                 #'FEATURE_LABEL': 6 # Not a feature, this is a label for the data
                                 }
 

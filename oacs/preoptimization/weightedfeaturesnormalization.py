@@ -31,6 +31,9 @@ class WeightedFeaturesNormalization(BasePreOptimization):
         # Compute the variance
         if Sigma2 is None:
             Sigma2 = UnivariateGaussian.variance(X, Mu)
+        # Avoiding NaNs
+        Sigma2.fillna(1) # Simplification: if for a feature there's no variance at all (= 0), the feature will be NaN. This happens for example if there's no really any recorded data for the feature yet. We don't want that because it will break classifiers' predictions probabilities. Thus we set variance = 1 for these so that we say it's already a normally-spread distribution (thus below only the mean will normalize the feature, it's already centered)
+        Sigma2[Sigma2 == 0.0] = 1 # Set 0 values to 1 (because else we will divide by zero, and get NaN!)
         # Backup the weights (because we don't want to lose them nor normalize them, we need them later for classification learning!)
         if 'framerepeat' in X.keys():
             bak = X['framerepeat']
