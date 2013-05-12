@@ -1,9 +1,9 @@
 {
     "run": [{"preoptimization": "optimize"}, {"classifier": "predict"}, {"decider": "decide"}, {"postaction": "action"}],
-    "run_learn": [{"classifier": "learn"}],
+    "run_learn": [{"preoptimization": "optimize"}, {"classifier": "learn"}],
     "classes": {
         "inputparser": "InterframeParser",
-        "preoptimization": ["FillNaN", "DropEmptyFeatures", "WeightedFeaturesNormalization"],
+        "preoptimization": ["FillNaN", "DropEmptyFeatures", "WeightedFeaturesNormalization", "Winsorize"],
         "classifier": "MultivariateGaussian",
         "decider": "BaseDecider",
         "postaction": ["Playerinfo", "PlayersTable", "SimplePrint", "DetectionLog", "RunCommand"]

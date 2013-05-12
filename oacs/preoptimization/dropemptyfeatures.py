@@ -22,7 +22,7 @@ class DropEmptyFeatures(BasePreOptimization):
     def __init__(self, config=None, *args, **kwargs):
         return BasePreOptimization.__init__(self, config, *args, **kwargs)
 
-    # Drop empty features (which always have the same value, and result in variance=0)
+    ## Drop empty features (which always have the same value, and result in variance=0)
     # @param X Samples set
     def optimize(self, X=None, *args, **kwargs):
         # Variance = 0 <=> sure that this feature is empty
@@ -30,5 +30,5 @@ class DropEmptyFeatures(BasePreOptimization):
         # If at least one feature is empty, we remove it
         if len(emptykeys) > 0:
             X = X.drop(emptykeys, axis=1)
-        # Return the NaNs-filled samples set
+
         return {'X':  X } # always return a dict of variables if you want your variables saved durably and accessible later
