@@ -30,7 +30,7 @@ class FeaturesNormalization(BasePreOptimization):
         # TODO: Pandas bug: if you do / X.std() instead of * (1.0/X.std()), python will loop and use 25 percent of the CPU, even when your application finished processing! This is a pandas or numpy bug. Avoid this bug by doing *(1.0/var) instead of dividing by var, or *var**-1, the results will be the same. https://github.com/pydata/pandas/issues/3407
 
         # Preparing the features: dropping examples labelled as anomalous, else it will fling out the stats
-        Yt = Y[Y==0].dropna() # get the list of non-anomalous examples
+        Yt = Y[Y==0].dropna() # get the list of non-anomalous examples. WARNING: the dropna() here is VERY necessary, else you will get a batch of True/False boolean values, but you still get all the rows! To trim out the rows we don't won't (Y!=0), we need to use dropna()
         Xt = X.iloc[Yt.index] # filter out anomalous examples and keep only non-anomalous ones
 
         # Either at learning we compute the mean and std, or either at detection we reload the learnt mean and std
