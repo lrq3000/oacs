@@ -112,6 +112,7 @@ class Runner:
     # @param args Optional arguments to pass to the method (must be a dictionary, with they keys being the name of the variables)
     # @param return_value Return a value instead of updating the local vars dict
     # TODO: reduce the number of maintained dictionaries (there are 4: self.vars, allvars, dictofvars and args)
+    # TODO: fix return_vars, it does not work so well (mixing up local variables and arguments variables. The best would be to use local variables where needed, but use argument variables foremost, and keep tracking of argument variables that are changed)
     def generic_call(self, obj, method, args=None, return_vars=False):
         # Create the local dict of vars
         allvars = dict() # input dict of vars
@@ -119,6 +120,7 @@ class Runner:
         # Append the optional arguments to pass to methods
         if args is not None and type(args) == dict:
                     allvars.update(args)
+                    if return_vars: dictofvars.update(args) # args and dictofvars must have ascendance over everything else when using return_vars
         # If we have a list of modules to call, we call the method of each and every one of those modules
         if isinstance(obj, (dict, OrderedDict)):
             # For every module in the list
