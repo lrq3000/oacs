@@ -29,7 +29,7 @@ class FillNaN(BasePreOptimization):
         # Backward fill remaining NaNs
         X = X.fillna(method='bfill')
         # Check that we have filled all NaNs
-        if (sum(X.count() < X.shape[0])): # If
-            print("FillNan warning: could not fill all NaNs, some NaNs are still in the dataset! Mean, variance and other classifier computations will probably fail!")
+        #if (sum(X.count() < X.shape[0])):
+        #    print("FillNan warning: could not fill all NaNs, some NaNs are still in the dataset! Mean, variance and other classifier computations will probably fail!")
         # Return the NaNs-filled samples set
         return {'X':  X } # always return a dict of variables if you want your variables saved durably and accessible later

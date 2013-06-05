@@ -39,4 +39,8 @@ class FeaturesNormalization(BasePreOptimization):
         if Nonstd_Sigma2 is None:
             Nonstd_Sigma2 = Xt.std()
 
-        return {'X':  (X - Nonstd_Mu) * (1.0/Nonstd_Sigma2), 'Nonstd_Mu': Nonstd_Mu, 'Nonstd_Sigma2': Nonstd_Sigma2} # always return a dict of variables if you want your variables saved durably and accessible later
+        # Compute the normalized dataset
+        Xt_std = (Xt - Nonstd_Mu) * (1.0/Nonstd_Sigma2)
+        Xt_std = pd.DataFrame(Xt_std, columns = Xt.columns) # make sure the columns do not get scrambled up (this happens sometimes...) FIXME: remove this additional processing when pandas will be more stable...
+
+        return {'X':  Xt_std, 'Nonstd_Mu': Nonstd_Mu, 'Nonstd_Sigma2': Nonstd_Sigma2} # always return a dict of variables if you want your variables saved durably and accessible later

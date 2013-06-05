@@ -7,6 +7,8 @@
 
 from oacs.preoptimization.basepreoptimization import BasePreOptimization
 
+import pandas as pd
+
 ## DropEmptyFeatures
 #
 # Drop empty features (which always have the same value, and result in variance=0).
@@ -38,9 +40,14 @@ class DropEmptyFeatures(BasePreOptimization):
         # Remove the empty features
         # If at least one feature is empty, we remove it
         if len(emptykeys) > 0:
-            print("Dropping empty feature(s) column(s): %s" % emptykeys) # Notify the user that we are dropping a few keys
+            if not Empty_features: # print only at learning, not at detection
+                print("Dropping empty feature(s) column(s): %s" % emptykeys) # Notify the user that we are dropping a few keys
             for key in emptykeys:
-                if key in X.columns:
-                    X = X.drop(key, axis=1) # Note: We could do it in one go with X = X.drop(emptykeys, axis=1) but it would fail if there were only a partial subset of the list of keys that are not yet removed and should be removed
+                if type(X) == pd.DataFrame:
+                    if key in X.columns:
+                            X = X.drop(key, axis=1) # Note: We could do it in one go with X = X.drop(emptykeys, axis=1) but it would fail if there were only a partial subset of the list of keys that are not yet removed and should be removed
+                elif type(X) == pd.Series:
+                    if key in X.keys():
+                        X = X.drop(key)
 
         return {'X':  X, 'Empty_features': emptykeys } # always return a dict of variables if you want your variables saved durably and accessible later

@@ -29,9 +29,13 @@ class WeightedFeaturesNormalization(BasePreOptimization):
     def optimize(self, X=None, Y=None, Nonstd_Mu=None, Nonstd_Sigma2=None, *args, **kwargs):
 
         # Preparing the features: dropping examples labelled as anomalous, else it will fling out the stats
-        Yt = Y[Y==0].dropna() # get the list of non-anomalous examples
-        Xt = X.iloc[Yt.index] # filter out anomalous examples and keep only non-anomalous ones
-        # Note: we use other variable names because we only want to compute the stats on them (mean, variance), and then apply these on the WHOLE dataset, not just the one filtered here (anomalous examples included)
+        if type(X) == pd.DataFrame:
+            Yt = Y[Y==0].dropna() # get the list of non-anomalous examples
+            Xt = X.iloc[Yt.index] # filter out anomalous examples and keep only non-anomalous ones
+            # Note: we use other variable names because we only want to compute the stats on them (mean, variance), and then apply these on the WHOLE dataset, not just the one filtered here (anomalous examples included)
+        else:
+            Xt = X
+
 
         # Compute the weighted mean
         if Nonstd_Mu is None: # Only if it is not already computed
@@ -45,11 +49,13 @@ class WeightedFeaturesNormalization(BasePreOptimization):
         # Backup the weights (because we don't want to lose them nor normalize them, we need them later for classification learning!)
         bak = None
         if 'framerepeat' in X.keys():
-            bak = X['framerepeat']
+            bak = Xt['framerepeat']
         # Compute the normalized dataset
-        X_std = (X - Nonstd_Mu) * (1.0/Nonstd_Sigma2**0.5) # TODO: Bug Pandas or Numpy: never do X / var, but X * (1.0/var) or X * var**-1, else if you divide, python will continue to run in the background and use 25 percent CPU! https://github.com/pydata/pandas/issues/3407
+        X_std = (Xt - Nonstd_Mu) * (1.0/Nonstd_Sigma2**0.5) # TODO: Bug Pandas or Numpy: never do X / var, but X * (1.0/var) or X * var**-1, else if you divide, python will continue to run in the background and use 25 percent CPU! https://github.com/pydata/pandas/issues/3407
         # Put back the weights
         if bak is not None: X_std['framerepeat'] = bak
+
+        Xt_std = pd.DataFrame(Xt_std, columns = Xt.columns) # make sure the columns do not get scrambled up (this happens sometimes...) FIXME: remove this additional processing when pandas will be more stable...
 
         # Return the result
         # Either at learning we compute the mean and std, or either at detection we reload the learnt mean and std

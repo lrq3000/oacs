@@ -30,7 +30,7 @@ class InterframeParser(BaseParser):
     featureTypeFilter = {
                                 'FEATURE_ID' : 0, 			# Identifier features
                                 #'FEATURE_HUMAN': 1,			# Human-specific features
-                                #'FEATURE_GAMESPECIFIC': 2,				# Game-specific features (game rules)
+                                'FEATURE_GAMESPECIFIC': 2,				# Game-specific features (game rules)
                                 'FEATURE_PHYSICS': 3,                     # Physics limitation features (to avoid!!!)
                                 'FEATURE_METADATA': 4,                 # Feature containing meta data about other features
                                 #'FEATURE_METAINTERFRAME': 5, # Meta data about the interframe (like the framerepeat, which should be used as a ponderation factor for all the others features)
@@ -184,6 +184,7 @@ class InterframeParser(BaseParser):
                 # Extracting labels
                 labels = self.types[self.types.isin(self.featureTypeLabel.values())].keys() # extracting all the column labels
                 Y = X[labels]
+                X = X.drop(labels) # Drop the columns from X
 
                 # Return a dict of generators
                 yield {'X':X, 'Y':Y, 'X_raw':X_raw}

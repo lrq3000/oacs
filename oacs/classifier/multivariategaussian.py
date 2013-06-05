@@ -72,9 +72,10 @@ class MultivariateGaussian(UnivariateGaussian):
         if type(X) == pd.Series:
             Pred = (2*pi)**(-n/2) * np.linalg.det(Sigma2)**0.5 * exp(-0.5 * xm.T.dot(np.linalg.pinv(Sigma2)).dot(xm))
         else:
-            T = xm.dot(np.linalg.pinv(Sigma2)) #debug
-            print T.shape #debug
-            print xm.T.shape #debug
+            #T = np.outer(xm.dot(np.linalg.pinv(Sigma2)), xm.T) #debug - produce Memory Error even with relatively small sets!
+            #print T.shape #debug
+            #print xm.shape #debug
+            #print(T.head())
             Pred = (2*pi)**(-n/2) * np.linalg.det(Sigma2)**0.5 * exp(-0.5 * (xm.dot(np.linalg.pinv(Sigma2)) * xm).sum(axis=1)) # TODO: fix this, it does not work with more than one sample to test at a time
 
         return {'Prediction': Pred} # return the class of the sample(s)
