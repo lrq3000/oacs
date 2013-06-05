@@ -51,7 +51,8 @@ class WeightedFeaturesNormalization(BasePreOptimization):
         if 'framerepeat' in X.keys():
             bak = Xt['framerepeat']
         # Compute the normalized dataset
-        X_std = (Xt - Nonstd_Mu) * (1.0/Nonstd_Sigma2**0.5) # TODO: Bug Pandas or Numpy: never do X / var, but X * (1.0/var) or X * var**-1, else if you divide, python will continue to run in the background and use 25 percent CPU! https://github.com/pydata/pandas/issues/3407
+        # Note: we compute on X and NOT Xt because we want to return the WHOLE dataset, but normalized on the non-anomalous examples
+        X_std = (X - Nonstd_Mu) * (1.0/Nonstd_Sigma2**0.5) # TODO: Bug Pandas or Numpy: never do X / var, but X * (1.0/var) or X * var**-1, else if you divide, python will continue to run in the background and use 25 percent CPU! https://github.com/pydata/pandas/issues/3407
         # Put back the weights
         if bak is not None: X_std['framerepeat'] = bak
 
