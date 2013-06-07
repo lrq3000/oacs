@@ -49,14 +49,14 @@ class WeightedFeaturesNormalization(BasePreOptimization):
         # Backup the weights (because we don't want to lose them nor normalize them, we need them later for classification learning!)
         bak = None
         if 'framerepeat' in X.keys():
-            bak = Xt['framerepeat']
+            bak = X['framerepeat']
         # Compute the normalized dataset
         # Note: we compute on X and NOT Xt because we want to return the WHOLE dataset, but normalized on the non-anomalous examples
         X_std = (X - Nonstd_Mu) * (1.0/Nonstd_Sigma2**0.5) # TODO: Bug Pandas or Numpy: never do X / var, but X * (1.0/var) or X * var**-1, else if you divide, python will continue to run in the background and use 25 percent CPU! https://github.com/pydata/pandas/issues/3407
         # Put back the weights
         if bak is not None: X_std['framerepeat'] = bak
 
-        X_std = pd.DataFrame(X_std, columns = Xt.columns) # make sure the columns do not get scrambled up (this happens sometimes...) FIXME: remove this additional processing when pandas will be more stable...
+        X_std = pd.DataFrame(X_std, columns = X.columns) # make sure the columns do not get scrambled up (this happens sometimes...) FIXME: remove this additional processing when pandas will be more stable...
 
         # Return the result
         # Either at learning we compute the mean and std, or either at detection we reload the learnt mean and std
