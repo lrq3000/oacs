@@ -41,7 +41,7 @@ class FeaturesNormalization(BasePreOptimization):
 
         # Compute the normalized dataset
         # Note: we compute on X and NOT Xt because we want to return the WHOLE dataset, but normalized on the non-anomalous examples
-        Xt_std = (X - Nonstd_Mu) * (1.0/Nonstd_Sigma2)
-        Xt_std = pd.DataFrame(Xt_std, columns = Xt.columns) # make sure the columns do not get scrambled up (this happens sometimes...) FIXME: remove this additional processing when pandas will be more stable...
+        X_std = (X - Nonstd_Mu) * (1.0/Nonstd_Sigma2)
+        X_std = pd.DataFrame(X_std, columns = Xt.columns) # make sure the columns do not get scrambled up (this happens sometimes...) FIXME: remove this additional processing when pandas will be more stable...
 
-        return {'X':  Xt_std, 'Nonstd_Mu': Nonstd_Mu, 'Nonstd_Sigma2': Nonstd_Sigma2} # always return a dict of variables if you want your variables saved durably and accessible later
+        return {'X':  X_std, 'Nonstd_Mu': Nonstd_Mu, 'Nonstd_Sigma2': Nonstd_Sigma2} # always return a dict of variables if you want your variables saved durably and accessible later

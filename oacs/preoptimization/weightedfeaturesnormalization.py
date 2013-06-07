@@ -56,7 +56,7 @@ class WeightedFeaturesNormalization(BasePreOptimization):
         # Put back the weights
         if bak is not None: X_std['framerepeat'] = bak
 
-        Xt_std = pd.DataFrame(Xt_std, columns = Xt.columns) # make sure the columns do not get scrambled up (this happens sometimes...) FIXME: remove this additional processing when pandas will be more stable...
+        X_std = pd.DataFrame(X_std, columns = Xt.columns) # make sure the columns do not get scrambled up (this happens sometimes...) FIXME: remove this additional processing when pandas will be more stable...
 
         # Return the result
         # Either at learning we compute the mean and std, or either at detection we reload the learnt mean and std

@@ -35,7 +35,7 @@ class DropEmptyFeatures(BasePreOptimization):
         else:
             # At learning, compute to find the empty features
             # Variance = 0 <=> sure that this feature is empty
-            emptykeys = X.columns[X.var() == 0].tolist() # equivalent to: X.columns[ (x == x.mean()).sum() == x.count() ] where we compare all values of a feature against its mean and see if at least one example has a different value
+            emptykeys = X.columns[(~X.var().notnull()) | (X.var() == 0)].tolist() # equivalent to: X.columns[ (x == x.mean()).sum() == x.count() ] where we compare all values of a feature against its mean and see if at least one example has a different value
 
         # Remove the empty features
         # If at least one feature is empty, we remove it
