@@ -13,6 +13,7 @@
     "typesfile":"types.txt",
     "parametersfile":"parameters.txt",
     "playerstable":"playerstable.txt",
+    "decider_threshold": 8.23212e-8,
     "detectionlogmsg":"$playername ($playerip $playerguid $playerid) was detected to be cheating at $datetime ($timestamp) with a probability of $Prediction",
     "runcommand":"crcon -P 27960 --type=q3a --password='testpass' localhost \"say ^1CHEAT DETECTED: $playername is cheating!\"",
     "bigdata": false,
