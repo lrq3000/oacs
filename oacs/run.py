@@ -77,9 +77,29 @@ class Runner:
     def addclass(self, submod, classname, listofclasses=False):
         try:
             aclass = import_class('.'.join([self.rootdir, submod, classname.lower()]), classname)
+            # If we have several classes, we append all of them in a subdict of the attribute assigned for this module ( eg: runner.MyModule[firstclass] )
             if listofclasses:
+                # Create the attribute as an OrderedDict if it does not exist yet
                 if not self.__dict__[submod]: self.__dict__[submod] = OrderedDict() # keep the order in which the items were given (all iterators will also follow the order). This allows to set in config the order in which we want the items to be executed.
-                self.__dict__[submod][classname.lower()] = aclass(config=self.config, parent=self)
+
+                # Managing several calls to the same class: if we try to call twice the same class (eg: DropEmptyFeatures) for example at the beginning of PreOptimization and also at the end, there will be only one call because we are using a dict to store the classes. Here we try to avoid that by renaming the class by appending a number at the end.
+                # If the class does not already exist in the dict, we can use the name as-is
+                if not classname.lower() in self.__dict__[submod]:
+                    self.__dict__[submod][classname.lower()] = aclass(config=self.config, parent=self)
+                # Else the class already exists (and is called before in the routine), and thus we have to rename this one
+                else:
+                    count = 2
+                    # Try to rename and increment the counter until we can store the class
+                    while 1:
+                        # Ok, this class name + current counter does not exist, we can store it
+                        newname = "%s_%s" % (classname.lower(), str(count))
+                        if not newname in self.__dict__[submod]:
+                            self.__dict__[submod][newname] = aclass(config=self.config, parent=self)
+                            break # exit the While loop
+                        # Else we increment the counter and continue
+                        else:
+                            count += 1
+            # Else we have only one class, we store it straight away in an attribute
             else:
                 self.__dict__[submod] = aclass(config=self.config, parent=self)
             return True
