@@ -86,8 +86,10 @@ class MultivariateGaussian(UnivariateGaussian):
     def mean(self, X, weights=None):
         return UnivariateGaussian.mean(X, weights)
 
-    ## Compute the weighted covariance matrix of the dataset
+    ## Compute the unbiased weighted sample covariance matrix of the dataset
     # Alternative to pandas.DataFrame.cov(), because pandas's and numpy's cov() can't account for weights (if you set mean = X.mean() and weights = None, then you'll get the exact same result as X.cov())
+    # Note: this works ONLY with unnormalized, integer weights >= 0 representing the number of occurrences of an observation (number of "repeat" of one row in the sample)
+    # LaTeX equation: \Sigma=\frac{1}{\sum_{i=1}^{N}w_i - 1}\sum_{i=1}^N w_i \left(x_i - \mu^*\right)^2
     # @param X One example or a dataset of examples (must the same columns/keys as mean)
     # @param mean Weighted mean (must have the same columns/keys as X, else you will get a weird result, because pandas will still try to adapt and things will get really messed up!)
     # @param weights Name of the weights column to remove from the final result (else it may flaw the computation of the prediction)
@@ -95,6 +97,8 @@ class MultivariateGaussian(UnivariateGaussian):
     @staticmethod
     def covar(X, mean, weights=None):
         if weights is None: weights = 'framerepeat'
+        w = None
+        if weights in X.keys(): w = X[weights] # backing up the keys
         if weights in X.keys() and weights not in mean.keys():
             if type(X) == pd.Series:
                 ax = 0
@@ -102,9 +106,16 @@ class MultivariateGaussian(UnivariateGaussian):
                 ax = 1
             X = X.drop(weights, axis=ax)
         xm = X-mean # xm = X diff to mean
-        xm = xm.fillna(0)
-        if type(X) == pd.Series:
-            sigma2 = np.outer(xm.T, xm); # force matrix multiplication outer product (else if you use np.dot() or pandas.dot(), it will align by the indexes and make the dot product)
+        xm = xm.fillna(0) # fill nan with 0 because anyway 0 will give a 0 covariance's coordinate (which means in practical that it is null), but the computation of other covariance's coordinates will be OK (while if you have NaNs you would end up with a covariance matrix filled with NaNs)
+        # BigData alternative: compute the covariance one sample at a time (one row with several columns representing different variables)
+        #if type(X) == pd.Series:
+        #    sigma2 = np.outer(xm.T, xm); # force matrix multiplication outer product (else if you use np.dot() or pandas.dot(), it will align by the indexes and make the dot product)
+        #else:
+
+        # If there are weights, compute the unbiased weighted sample covariance
+        if w is not None:
+            sigma2 = 1./(w.sum()-1) * xm.mul(w, axis=0).T.dot(xm);
+        # Else we compute the unbiased sample covariance (without weights)
         else:
             m = X.shape[0]
             sigma2 = 1./(m-1) * xm.T.dot(xm); # Sigma2 = 1/m * X' * X

@@ -62,7 +62,9 @@ class UnivariateGaussian(BaseClassifier):
 
         return {'Prediction': Pred} # return the class of the sample(s)
 
-    ## Compute the weighted mean of the dataset
+    ## Compute the (unbiased) weighted sample mean of the dataset
+    # Note: this works for both unnormalized and normalized weights (give the exact same result)
+    # LaTeX equation: \mathbf{\mu^*}=\frac{\sum_{i=1}^N w_i \mathbf{x}_i}{\sum_{i=1}^N w_i}
     # @param X Samples dataset
     # @param weights Vector/Series of weights (ie: number of times one sample has to be repeated) - default: X['framerepeat']
     # TODO: bigdata iteration version (detect generator?)
@@ -94,7 +96,9 @@ class UnivariateGaussian(BaseClassifier):
         mean = X.sum().astype(float) / X.ix[:,'framerepeat'].sum()
         return mean
 
-    ## Compute the weighted unbiased variance of each feature for a given dataset
+    ## Compute the unbiased weighted sample variance of each feature for a given dataset
+    # Note: this works ONLY with unnormalized, integer weights >= 0 representing the number of occurrences of an observation (number of "repeat" of one row in the sample)
+    # LaTeX equation: s^2\ = \frac {1} {\sum_{i=1}^n w_i - 1} \sum_{i=1}^N w_i \left(x_i - \mu^*\right)^2
     # @param X Samples dataset
     # @param mean Weighted mean
     # @param weights Vector/Series of weights (ie: number of times one sample has to be repeated) - default: X['framerepeat']
