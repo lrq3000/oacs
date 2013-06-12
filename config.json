@@ -3,7 +3,7 @@
     "run_learn": [{"preoptimization": "optimize"}, {"classifier": "learn"}],
     "classes": {
         "inputparser": "InterframeParser",
-        "preoptimization": ["FillNaN", "WeightedFeaturesNormalization", "Winsorize", "DropEmptyFeatures"],
+        "preoptimization": ["FillNaN", "WeightedFeaturesNormalization", "DropEmptyFeatures", "PCA"],
         "classifier": "MultivariateGaussian",
         "decider": "BaseDecider",
         "postaction": ["Playerinfo", "PlayersTable", "SimplePrint", "DetectionLog", "RunCommand"]
@@ -20,6 +20,7 @@
     "cansgaussian_maxitemspercluster": 4,
     "cansgaussian_mergeclusters": false,
     "winsorize_rate": 84,
+    "pca_dimensions_variation_loss_threshold": 0.4,
     "optimization": {
         "post": {
             "crossval": {

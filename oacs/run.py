@@ -3,7 +3,7 @@
 
 from auxlib import *
 from oacs.configparser import ConfigParser
-import os, StringIO
+import os, sys, StringIO
 import pandas as pd
 import time
 from collections import OrderedDict
@@ -130,10 +130,11 @@ class Runner:
     # @param obj Object or list of objects
     # @param method Method to call in the object(s) (as string)
     # @param args Optional arguments to pass to the method (must be a dictionary, with they keys being the name of the variables)
-    # @param return_value Return a value instead of updating the local vars dict
+    # @param return_vars Return a value instead of updating the local vars dict
+    # @param verbose Print more details about the executed routine
     # TODO: reduce the number of maintained dictionaries (there are 4: self.vars, allvars, dictofvars and args)
     # TODO: fix return_vars, it does not work so well (mixing up local variables and arguments variables. The best would be to use local variables where needed, but use argument variables foremost, and keep tracking of argument variables that are changed)
-    def generic_call(self, obj, method, args=None, return_vars=False):
+    def generic_call(self, obj, method, args=None, return_vars=False, verbose=False):
         # Create the local dict of vars
         allvars = dict() # input dict of vars
         if return_vars: dictofvars = dict() # output dict of vars (if return_vars is True)
@@ -145,6 +146,8 @@ class Runner:
         if isinstance(obj, (dict, OrderedDict)):
             # For every module in the list
             for submodule in obj.itervalues():
+                # Print infos
+                if verbose: print("Routine: Calling module %s..." % submodule.__class__.__name__)
                 # Update the local dict of vars
                 allvars.update(self.vars)
                 if return_vars: allvars.update(dictofvars)
@@ -157,6 +160,8 @@ class Runner:
                 else:
                     # Else we update a temporary dictofvars and we return it at the end
                     dictofvars.update(fullfunc(**allvars))
+                # Force flusing the text into the terminal
+                sys.stdout.flush()
             # Return the dictofvars at the end of the loop if the user wants to return the variables to the caller instead of storing them locally
             if return_vars:
                 allvars.update(dictofvars) # return the input vars updated with the outputvars
@@ -164,6 +169,8 @@ class Runner:
 
         # Else if it is an object (thus only one module to call), we directly call its method
         else:
+            # Print infos
+            if verbose: print("Routine: Calling module %s..." % obj.__class__.__name__)
             # Get the callable object's method
             fullfunc = getattr(obj, method)
             # Update the local dict of vars
@@ -175,28 +182,34 @@ class Runner:
             else:
                 allvars.update(fullfunc(**allvars)) # return the input vars updated with the outputvars
                 return allvars
+            # Force flusing the text into the terminal
+            sys.stdout.flush()
 
     ## Generically call any module given a list of dicts containing {"submodule name": "method of the class to call"}
     # @param executelist A list containing the sequence of modules to launch (Note: the order of the contained elements matters!)
-    def execute(self, executelist):
+    # @param verbose Print more details about the executed routine
+    def execute(self, executelist, verbose=False):
         # Loop through all modules in run_learn list
         for mod in executelist:
             # Catch exceptions: if a module fails, we continue onto the next one
             #try:
             # Special case: this is a sublist, we run all the modules in the list in parallel
             if type(mod) == type(list()):
-                self.generic_call(mod) # TODO: launch each submodule in parallel (using subprocess or threading, but be careful: Python's threads aren't efficient so this is not useful at all, and subprocess creates a new object, so how to communicate the computed/returned variables efficiently in memory?)
+                self.generic_call(mod, verbose=verbose) # TODO: launch each submodule in parallel (using subprocess or threading, but be careful: Python's threads aren't efficient so this is not useful at all, and subprocess creates a new object, so how to communicate the computed/returned variables efficiently in memory?)
             else:
                 # Unpacking the dict
                 module = mod.keys()[0]
                 func = mod.values()[0]
 
-                self.generic_call(self.__dict__[module], func)
+                self.generic_call(self.__dict__[module], func, verbose=verbose)
                 #self.updatevars(self.learningalgo.learn(**self.vars))
                 # dans learningalgo faire un if self.config.config['bigdata'] self.learn_bulk() or self.learn_bigdata()
                 #eg: return {'X': df, 'Y': something, etc..}
             #except Exception, e:
                 #print "Exception when executing the routine: %s" % str(e)
+
+            # Force flusing the text into the terminal
+            sys.stdout.flush()
 
         return True
 
@@ -369,13 +382,14 @@ class Runner:
                 executelist.append({"postoptimization": "optimize"})
 
         # Load the data prior to the execution of the learning routine
+        print("Initializing: loading the dataset, this can take a few moments, please wait...")
         if not self.config.config.get('bigdata'):
             self.generic_call(self.inputparser, 'load')
         else: # Special case: for the input parser, we call the read method if we are in bigdata mode
             self.updatevars({'X': self.inputparser.read()}) # we put the generator of variables in X
 
         # Execute all modules of the routine (either of config['run_learn'] or the standard routine)
-        self.execute(executelist)
+        self.execute(executelist, verbose=True) # We generally prefer to print all infos when learning
 
         # End of learning, we save the parameters if a parametersfile was specified
         if self.config.config.get('parametersfile', None):
