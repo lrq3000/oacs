@@ -382,7 +382,7 @@ class Runner:
                 executelist.append({"postoptimization": "optimize"})
 
         # Load the data prior to the execution of the learning routine
-        print("Initializing: loading the dataset, this can take a few moments, please wait...")
+        print("Initializing: loading the dataset, this can take a few moments, please wait..."); sys.stdout.flush()
         if not self.config.config.get('bigdata'):
             self.generic_call(self.inputparser, 'load')
         else: # Special case: for the input parser, we call the read method if we are in bigdata mode
