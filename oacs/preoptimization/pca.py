@@ -60,9 +60,6 @@ class PCA(BasePreOptimization):
         if 'framerepeat' in X.keys():
             bak = X['framerepeat']
 
-        # drop the framerepeat key, we don't want to extract eigenvectors on this axis!
-        Sigma2 = Sigma2.drop('framerepeat', axis=0).drop('framerepeat', axis=1)
-
         # Compute the eigenvectors
         PCA_U, PCA_S, PCA_V = PCA.compute_vectors(Sigma2)
 
@@ -92,7 +89,9 @@ class PCA(BasePreOptimization):
     # @return U,S,V eigenvectors, eigenvalues and ordered variations over the eigenvectors (from the biggest to the smallest)
     @staticmethod
     def compute_vectors(Sigma2):
-        U, S, V = np.linalg.svd(Sigma2)
+        if 'framerepeat' in Sigma2.columns:
+            Sigma2 = Sigma2.drop('framerepeat', axis=0).drop('framerepeat', axis=1) # drop the framerepeat key, we don't want to extract eigenvectors on this axis!
+        U, S, V = np.linalg.svd(Sigma2) # Compute the eigenvectors and eigenvalues and ordered variations along all those vectors
         V = V.T # because np.linalg.svd() returns V.T and not V, we must put it back in the right transposition
         U = pd.DataFrame(U, index=Sigma2.columns) # Convert U to a DataFrame with meaningful indexes
         return (U,S,V)
