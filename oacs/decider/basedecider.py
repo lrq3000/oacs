@@ -29,8 +29,9 @@ class BaseDecider(BaseClass):
     # Note: you can either directly work with X and call the functions by yourself, or you can call them in run executelist and then get the Prediction info
     # @param Prediction A scalar or a vector of predictions (preferably probabilities, but you are free to do whatever you want, as long as you manage the predictions values properly in your decider)
     # @param Threshold Below this threshold, a player is considered to be a cheater (likelihood of humanly actions is low)
+    # @param CompDir Direction of the comparison operator (either 'gt' for greater than the threshold, either 'lt' for lesser than the threshold)
     # @return DictOfVars Should at least return a dict of variables containing only at least 'Cheater' (True or False)
-    def decide(self, Prediction=None, Threshold=0.5, *args, **kwargs):
+    def decide(self, Prediction=None, Threshold=0.5, CompDir='lt', *args, **kwargs):
 
         # Debug mode: Assign a random value to Prediction if none is set
         if self.config.config.get('debug'):
@@ -42,7 +43,9 @@ class BaseDecider(BaseClass):
 
         #print(Prediction)
         # If the player is below the threshold, we flag him as a cheater
-        if Prediction < Threshold:
+        if CompDir == 'gt' and Prediction > Threshold: # "Greater than" comparison
+            cheater = True # the player is a cheater!
+        elif CompDir == 'lt' and Prediction < Threshold: # "Less than" comparison
             cheater = True # the player is a cheater!
         else:
             cheater = False # the player is not a cheater
