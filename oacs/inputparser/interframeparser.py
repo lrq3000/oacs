@@ -55,8 +55,8 @@ class InterframeParser(BaseParser):
             typesfile = file[0]
             datafile = file[1]
         else:
-            typesfile = self.config.config['typesfile']
-            datafile = self.config.config['datafile']
+            typesfile = self.config.get('typesfile')
+            datafile = self.config.get('datafile')
 
         self.types = pd.read_csv(typesfile, index_col=None, header=0) # squeeze=True does not work for row-oriented csv as of current pandas version!
         self.types = self.types.ix[0, :] # convert to a pandas Series
@@ -89,8 +89,8 @@ class InterframeParser(BaseParser):
             typesfile = file[0]
             datafile = file[1]
         else:
-            typesfile = self.config.config['typesfile']
-            datafile = self.config.config['datafile']
+            typesfile = self.config.get('typesfile')
+            datafile = self.config.get('datafile')
 
         # Check that variables values are possible
         if chunks_size < 1:
@@ -123,8 +123,8 @@ class InterframeParser(BaseParser):
             typesfile = file[0]
             datafile = file[1]
         else:
-            typesfile = self.config.config['typesfile']
-            datafile = self.config.config['datafile']
+            typesfile = self.config.get('typesfile')
+            datafile = self.config.get('datafile')
 
         # Skip to the end of the file (avoid redetecting the same samples)
         if skip_to_end and not self.getpos():

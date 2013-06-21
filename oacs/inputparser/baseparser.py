@@ -34,7 +34,7 @@ class BaseParser(BaseClass):
     def load(self, file=None, *args, **kwargs):
         # If the input file was not specified, we use the config
         if not file:
-            file = self.config.config["inputfile"]
+            file = self.config.get("inputfile")
 
         try:
             f = open(file, 'rb') # open in binary mode to avoid line returns translation (else the reading will be flawed!). We have to do it both at saving and at reading.
@@ -53,7 +53,7 @@ class BaseParser(BaseClass):
     def read(self, file=None, *args, **kwargs):
         # If the input file was not specified, we use the config
         if not file:
-            file = self.config.config["inputfile"]
+            file = self.config.get("inputfile")
 
         # open in binary mode to avoid line returns translation (else the reading will be flawed!). We have to do it both at saving and at reading.
         with open(file, 'rb') as f:

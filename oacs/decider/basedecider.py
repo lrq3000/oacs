@@ -34,12 +34,12 @@ class BaseDecider(BaseClass):
     def decide(self, Prediction=None, Threshold=0.5, CompDir='lt', *args, **kwargs):
 
         # Debug mode: Assign a random value to Prediction if none is set
-        if self.config.config.get('debug'):
+        if self.config.get('debug'):
             Prediction = random.uniform(0.0,1.0)
-        if self.config.config.get('debug', None): print(Prediction)
+        if self.config.get('debug', None): print(Prediction)
 
-        if self.config.config.get('decider_threshold', None) is not None:
-            Threshold = self.config.config.get('decider_threshold')
+        if self.config.get('decider_threshold', None) is not None:
+            Threshold = self.config.get('decider_threshold')
 
         #print(Prediction)
         # If the player is below the threshold, we flag him as a cheater

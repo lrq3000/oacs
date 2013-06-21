@@ -30,7 +30,7 @@ class RunCommand(BasePostAction):
         # If player is not a cheater, we quit
         if not Cheater: return None
         # Get the list of commands to run
-        cmdlist = self.config.config.get('runcommand', None)
+        cmdlist = self.config.get('runcommand', None)
         # If this module is enabled but there's no command, quit
         if cmdlist is None: return None
         # If in fact we have a string (only one command) instead of a list, we convert it to a list of one element

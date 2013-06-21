@@ -33,7 +33,7 @@ class CsvParser(BaseParser):
     def load(self, file=None, row_header=0, col_header=None, *args, **kwargs):
         # If the input file was not given in argument, we use the config
         if not file:
-            file = self.config.config['datafile']
+            file = self.config.get('datafile')
 
         # Read the Data file in chunks of 1000 lines (to avoid a too big memory footprint)
         datagen = pd.read_csv(file, iterator=True, chunksize=1000, index_col=col_header, header=row_header, prefix='X')
@@ -51,7 +51,7 @@ class CsvParser(BaseParser):
     def __read_alt(self, file=None, chunks_size=1, row_header=0, col_header=None, *args, **kwargs):
         # If the input file was not given in argument, we use the config
         if not file:
-            file = self.config.config['datafile']
+            file = self.config.get('datafile')
 
         # Check that variables values are possible
         if chunks_size < 1:
@@ -70,7 +70,7 @@ class CsvParser(BaseParser):
     def read(self, file=None, skip_to_end=False, *args, **kwargs):
         # If the input file was not given in argument, we use the config
         if not file:
-            file = self.config.config['datafile']
+            file = self.config.get('datafile')
 
         # Skip to the end of the file (avoid redetecting the same samples)
         if skip_to_end and not self.getpos():

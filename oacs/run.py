@@ -369,7 +369,7 @@ class Runner:
     def learn(self, executelist=None):
         # We can pass an execution list either as an argument (used for recursion) or in the configuration
         if not executelist:
-            executelist = self.config.config.get('run_learn', None)
+            executelist = self.config.get('run_learn', None)
 
         # Standard learning routine
         # If no routine is given, then we execute the standard learning routine
@@ -383,7 +383,7 @@ class Runner:
 
         # Load the data prior to the execution of the learning routine
         print("Initializing: loading the dataset, this can take a few moments, please wait..."); sys.stdout.flush()
-        if not self.config.config.get('bigdata'):
+        if not self.config.get('bigdata'):
             self.generic_call(self.inputparser, 'load')
         else: # Special case: for the input parser, we call the read method if we are in bigdata mode
             self.updatevars({'X': self.inputparser.read()}) # we put the generator of variables in X
@@ -392,20 +392,20 @@ class Runner:
         self.execute(executelist, verbose=True) # We generally prefer to print all infos when learning
 
         # End of learning, we save the parameters if a parametersfile was specified
-        if self.config.config.get('parametersfile', None):
-            Runner.save_vars(self.config.config['parametersfile'], self.vars, ['X', 'Y', 'X_raw']) # save all vars but X and Y (which may be VERY big and aren't parameters anyway)
+        if self.config.get('parametersfile', None):
+            Runner.save_vars(self.config.get('parametersfile'), self.vars, ['X', 'Y', 'X_raw', 'Weights']) # save all vars but X and Y (which may be VERY big and aren't parameters anyway)
 
         return True
 
     ## Main/Prediction loop
     def run(self, executelist=None):
         # Load the parameters if a file is specified
-        if self.config.config.get('parametersfile', None):
+        if self.config.get('parametersfile', None):
             self.updatevars(Runner.load_vars(self.config.config['parametersfile']))
 
         # We can pass an execution list either as an argument (used for recursion) or in the configuration
         if not executelist:
-            executelist = self.config.config.get('run', None)
+            executelist = self.config.get('run', None)
 
         # Standard detection routine
         # If no routine is given, then we execute the standard detection routine
@@ -419,15 +419,15 @@ class Runner:
                 executelist.append({"postaction": "action"})
 
         # Caching a few vars (faster than accessing methods)
-        run_minisleep = self.config.config.get('run_minisleep', 0.01)
-        run_sleep = self.config.config.get('run_sleep', 1)
+        run_minisleep = self.config.get('run_minisleep', 0.01)
+        run_sleep = self.config.get('run_sleep', 1)
 
         # Main loop
         while 1:
             try:
                 # Set the reading cursor at the end of the file (last line)
                 skip_to_end = True
-                if not self.config.config.get('simulatedetection', None):
+                if not self.config.get('simulatedetection', None):
                     skip_to_end=False
                 # Get the samples generator
                 gen = self.inputparser.read(skip_to_end=True)

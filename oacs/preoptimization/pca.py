@@ -46,11 +46,11 @@ class PCA(BasePreOptimization):
             Sigma2 = MultivariateGaussian.covar(X, Mu)
 
         # Loading parameters from config if available
-        if PCA_K is None and self.config.config.get("pca_dimensions_number"): # give priority to parameters given as function's arguments
-            PCA_K = self.config.config.get("pca_dimensions_number")
+        if PCA_K is None and self.config.get("pca_dimensions_number"): # give priority to parameters given as function's arguments
+            PCA_K = self.config.get("pca_dimensions_number")
 
-        if PCA_Threshold is None and self.config.config.get("pca_dimensions_variation_loss_threshold"): # give priority to parameters given as function's arguments
-            PCA_Threshold = self.config.config.get("pca_dimensions_variation_loss_threshold")
+        if PCA_Threshold is None and self.config.get("pca_dimensions_variation_loss_threshold"): # give priority to parameters given as function's arguments
+            PCA_Threshold = self.config.get("pca_dimensions_variation_loss_threshold")
 
         if PCA_K is None and PCA_Threshold is None: # default value for PCA_Threshold = 0.01 = 1% of VariationLoss tolerance
             PCA_Threshold = 0.01

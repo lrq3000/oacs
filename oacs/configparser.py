@@ -74,3 +74,11 @@ class ConfigParser(object):
         with open(file, 'wb') as f: # open in binary mode to avoid line returns translation (else the reading will be flawed!). We have to do it both at saving and at reading.
             f.write( json.dumps(self.config, sort_keys=True, indent=4) ) # write the config as a json serialized string, but beautified to be more human readable
         return True
+
+    # Get a value from the config dict (this is a proxy method)
+    def get(self, *args, **kwargs):
+        return self.config.get(*args, **kwargs)
+
+    # Set a value in the config dict (this is a proxy method)
+    def set(self, *args, **kwargs):
+        return self.config.set(*args, **kwargs)

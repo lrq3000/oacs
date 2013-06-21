@@ -53,7 +53,7 @@ class CANSGaussian(MultivariateGaussian, UnivariateGaussian):
         MI = CANSGaussian.mutualinformation(X, H, H2)
 
         # Compute the clusters
-        clusters = CANSGaussian.micluster(X, MI, cmax=self.config.config.get("cansgaussian_maxitemspercluster", 1), mergeclusters=self.config.config.get("cansgaussian_mergeclusters", False), MImax=self.config.config.get("cansgaussian_scorethreshold", None))
+        clusters = CANSGaussian.micluster(X, MI, cmax=self.config.get("cansgaussian_maxitemspercluster", 1), mergeclusters=self.config.get("cansgaussian_mergeclusters", False), MImax=self.config.get("cansgaussian_scorethreshold", None))
 
         # Computing the covariance matrixes for each subset of clusters
         Covar = []

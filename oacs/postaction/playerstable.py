@@ -68,8 +68,8 @@ class PlayersTable(BasePostAction):
 
     def _updatePlayersTable(self):
         # Setup the files we need
-        ptfile = self.config.config.get('playerstable', None) # Playerstable source log file
-        ptdb = self.config.config.get('playerstabledb', 'playerstabledb.h5') # Target playerstable database in HDF
+        ptfile = self.config.get('playerstable', None) # Playerstable source log file
+        ptdb = self.config.get('playerstabledb', 'playerstabledb.h5') # Target playerstable database in HDF
 
         # No source file? we quit
         if ptfile is None: return None

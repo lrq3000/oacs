@@ -31,8 +31,8 @@ class Winsorize(BasePreOptimization):
     # TODO: account for weights in scoreatpercentile, here it does not account
     def optimize(self, X=None, Rate=98, winsorize_extreme_low=None, winsorize_extreme_high=None, *args, **kwargs):
 
-        if self.config.config.get("winsorize_rate"):
-            Rate = self.config.config.get("winsorize_rate")
+        if self.config.get("winsorize_rate"):
+            Rate = self.config.get("winsorize_rate")
 
         # Compute the complement of the rate
         r = (100-Rate)/2

@@ -34,14 +34,14 @@ class DetectionLog(BasePostAction):
         # If player is not a cheater, we quit
         if not Cheater: return None
 
-        detectionlog = self.config.config.get('detectionlog', 'detectionlog.txt')
+        detectionlog = self.config.get('detectionlog', 'detectionlog.txt')
 
         # Add the variables inside Playerinfo dict as variables themselves
         if Playerinfo is not None:
             kwargs.update(Playerinfo)
 
         # Load the template string to use for the lines
-        template = self.config.config.get('detectionlogmsg', self.defaultmsg)
+        template = self.config.get('detectionlogmsg', self.defaultmsg)
 
         # Substitute all variables in our template
         # For each available variable
