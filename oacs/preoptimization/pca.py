@@ -32,7 +32,7 @@ class PCA(BasePreOptimization):
     # @param PCA_Threshold Maximum Variation Loss tolerated (between 0 and 1, 1 being 100%). At learning, can be used to find the best PCA_K. Default = 0.01 (= 1% tolerated)
     # @param Sigma2 Reuse an already computed covariance matrix if possible
     # @param Mu Reuse an already computed mean if possible
-    def optimize(self, X=None, PCA_K=None, PCA_U=None, PCA_S=None, PCA_Threshold=None, Sigma2=None, Mu=None, *args, **kwargs):
+    def optimize(self, X=None, PCA_K=None, PCA_U=None, PCA_S=None, PCA_V=None, PCA_Threshold=None, Sigma2=None, Mu=None, *args, **kwargs):
 
         # DEPRECATED: we don't want to drop anomalous examples here, because we want to keep the eigenvectors where there are a maximum of variances to derive correlations, and anomalous examples can help us gather more variations!
         # Preparing the features: dropping examples labelled as anomalous, else it will fling out the stats
@@ -61,7 +61,11 @@ class PCA(BasePreOptimization):
             bak = X['framerepeat']
 
         # Compute the eigenvectors
-        PCA_U, PCA_S, PCA_V = PCA.compute_vectors(Sigma2)
+        if PCA_U is None: # only if needed
+            PCA_U, PCA_S, PCA_V = PCA.compute_vectors(Sigma2)
+        else: # else, we check that the data is of the right datatype
+            if type(PCA_S) != pd.DataFrame:
+                PCA_S = pd.DataFrame(PCA_S)
 
         # Find the best K dimensions to minimize the variation loss
         VariationLoss = None
@@ -94,6 +98,7 @@ class PCA(BasePreOptimization):
         U, S, V = np.linalg.svd(Sigma2) # Compute the eigenvectors and eigenvalues and ordered variations along all those vectors
         V = V.T # because np.linalg.svd() returns V.T and not V, we must put it back in the right transposition
         U = pd.DataFrame(U, index=Sigma2.columns) # Convert U to a DataFrame with meaningful indexes
+        U = U.add_prefix('X') # Add a prefix to each column name, this will ease dot products and other matrix computations later on (else pandas will get confused and complain that matrixes are not aligned!)
         return (U,S,V)
 
     ## Compute the variation loss
@@ -133,7 +138,7 @@ class PCA(BasePreOptimization):
     def project(X, U, K):
         X = X.drop('framerepeat', axis=1) # drop the framerepeat of course
         # Project the dataset onto the first K eigenvectors (since the matrixes returned by the SVD are ordered, from the highest variance eigenvectors to the lowest variance ones)
-        Z = pd.DataFrame(np.dot(X, U.ix[:, 0:K-1])) # When using Pandas, U.ix[:, 0:K-1] is equal to numpy's U[:, 0:K] (there's an offset of +1 using Pandas, thus we correct it here)
+        Z = pd.DataFrame(np.dot(X, U.ix[:, 0:K-1]), columns=U.columns[0:K-1]) # When using Pandas, U.ix[:, 0:K-1] is equal to numpy's U[:, 0:K] (there's an offset of +1 using Pandas, thus we correct it here)
         return Z
 
     ## Alias for PCA.project()
