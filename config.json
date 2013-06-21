@@ -3,7 +3,7 @@
     "run_learn": [{"preoptimization": "optimize"}, {"classifier": "learn"}],
     "classes": {
         "inputparser": "InterframeParser",
-        "preoptimization": ["FillNaN", "WeightedFeaturesNormalization", "DropEmptyFeatures", "PCA"],
+        "preoptimization": ["FillNaN", "WeightedFeaturesNormalization", "DropEmptyFeatures"],
         "classifier": "MultivariateGaussian",
         "decider": "BaseDecider",
         "postaction": ["Playerinfo", "PlayersTable", "SimplePrint", "DetectionLog", "RunCommand"]
