@@ -58,6 +58,10 @@ class InterframeParser(BaseParser):
             typesfile = self.config.get('typesfile')
             datafile = self.config.get('datafile')
 
+        # Get the list of columns we want to filter out (if specified), it is more efficient to do at parsing than later
+        filtercols = self.config.get('parser_filter_columns')
+
+        # Load the types from the types file
         self.types = pd.read_csv(typesfile, index_col=None, header=0) # squeeze=True does not work for row-oriented csv as of current pandas version!
         self.types = self.types.ix[0, :] # convert to a pandas Series
 
@@ -67,6 +71,11 @@ class InterframeParser(BaseParser):
         # Else we filter out columns that are useless for learning
         else:
             filtertypes = self.types[~self.types.isin(self.featureTypeFilter.values())].keys() # get the list of columns we want to keep in the Data
+
+        # Drop out the columns specified by the user in config
+        if filtercols is not None:
+            for col in filtercols:
+                filtertypes = filtertypes.drop(col)
 
         # Read the Data file in chunks of 1000 lines (to avoid a too big memory footprint)
         data = pd.read_csv(datafile, iterator=True, chunksize=1000, usecols=filtertypes)
