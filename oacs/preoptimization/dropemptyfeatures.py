@@ -29,7 +29,7 @@ class DropEmptyFeatures(BasePreOptimization):
     # @param Empty_features At detection, you can reload the previously learnt parameter here
     def optimize(self, X=None, Empty_features=None, *args, **kwargs):
         # Get the list of empty keys
-        if Empty_features:
+        if Empty_features is not None:
             # At detection, reuse the previously learnt list of empty features
             emptykeys = Empty_features
         else:
@@ -40,7 +40,7 @@ class DropEmptyFeatures(BasePreOptimization):
         # Remove the empty features
         # If at least one feature is empty, we remove it
         if len(emptykeys) > 0:
-            if not Empty_features: # print only at learning, not at detection
+            if Empty_features is None: # print only at learning, not at detection
                 print("Dropping empty feature(s) column(s): %s" % emptykeys) # Notify the user that we are dropping a few keys
             for key in emptykeys:
                 if type(X) == pd.DataFrame:
