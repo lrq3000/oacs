@@ -3,14 +3,19 @@
     "run_learn": [{"preoptimization": "optimize"}, {"classifier": "learn"}],
     "classes": {
         "inputparser": "InterframeParser",
-        "preoptimization": ["FillNaN", "WeightedFeaturesNormalization", "DropEmptyFeatures"],
+        "preoptimization": ["FillNaN", "WeightedFeaturesNormalization", "DropEmptyFeatures", "PCA"],
         "classifier": "MultivariateGaussian",
         "decider": "BaseDecider",
         "postaction": ["Playerinfo", "PlayersTable", "SimplePrint", "DetectionLog", "RunCommand"]
         },
     "debug": false,
     "datafile":"data.txt",
-    "typesfile":"types.txt",
+    /* This is a comment
+    over
+    multiple lines
+    * lines
+    */
+    "typesfile":"types.txt", // And this is another comment
     "parametersfile":"parameters.txt",
     "playerstable":"playerstable.txt",
     "decider_threshold": 8.23212e-8,
@@ -20,7 +25,7 @@
     "cansgaussian_maxitemspercluster": 4,
     "cansgaussian_mergeclusters": false,
     "winsorize_rate": 84,
-    "pca_dimensions_variation_loss_threshold": 0.4,
+    "pca_dimensions_variation_loss_threshold": 0.2,
     "optimization": {
         "post": {
             "crossval": {
