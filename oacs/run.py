@@ -30,7 +30,7 @@ class Runner:
         self.config = ConfigParser()
         configfile = args['config']; del args['config'] # delete the config argument, which is at best a self reference
         self.config.init(configfile)
-        self.config.load(args, extras)
+        self.config.load(args, extras, comments=True)
 
         #-- Loading classes
         for (submod, classname) in self.config.config["classes"].iteritems(): # for each item/module specified in classes

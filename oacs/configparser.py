@@ -38,10 +38,16 @@ class ConfigParser(object):
     ## Load a configuration file into the local dict
     # @param pargs Recognized (processed) commandline arguments (this will overwrite parameters from the configuration file in case of conflicts)
     # @param extras Unrecognized (unprocessed) commandline arguments (will also overwrite parameters from the configuration file)
-    def load(self, pargs=None, extras=None, *args, **kwargs):
+    # @param comments If set to true, Javascript-like comments will be filtered from the configuration file
+    def load(self, pargs=None, extras=None, comments=True, *args, **kwargs):
         # Loading the configuration file
         with file(self.configfile) as f:
-            self.config = json.loads(f.read())
+            # If there are comments in the config, filter them before converting the json to a Python object
+            if comments:
+                self.config = json.loads(self._removecomments(f.read()))
+            # Else we can directly load the json
+            else:
+                self.config = json.loads(f.read())
 
         # Overwriting with recognized commandline switches
         if pargs:
@@ -66,7 +72,7 @@ class ConfigParser(object):
 
     ## Reload the configuration file
     def reload(self, *args, **kwargs):
-        self.load()
+        self.load(comments=True, *args, **kwargs)
 
     ## Save the current configuration (with commandline arguments processed) into a file
     # @param file Path to where the configuration file should be saved
@@ -82,3 +88,63 @@ class ConfigParser(object):
     # Set a value in the config dict (this is a proxy method)
     def set(self, *args, **kwargs):
         return self.config.set(*args, **kwargs)
+
+    ## Filter efficiently Javascript-like inline and multiline comments from a JSON file
+    # Author: WizKid https://gist.github.com/WizKid/1170297
+    # @param s string to filter
+    # @return string filtered string without comments
+    def _removecomments(self, s):
+        inCommentSingle = False
+        inCommentMulti = False
+        inString = False
+
+        t = []
+        l = len(s)
+
+        i = 0
+        fromIndex = 0
+        while i < l:
+            c = s[i]
+
+            if not inCommentMulti and not inCommentSingle:
+                if c == '"':
+                    slashes = 0
+                    for j in xrange(i - 1, 0, -1):
+                        if s[j] != '\\':
+                            break
+
+                        slashes += 1
+
+                    if slashes % 2 == 0:
+                        inString = not inString
+
+                elif not inString:
+                    if c == '#':
+                        inCommentSingle = True
+                        t.append(s[fromIndex:i])
+                    elif c == '/' and i + 1 < l:
+                        cn = s[i + 1]
+                        if cn == '/':
+                            inCommentSingle = True
+                            t.append(s[fromIndex:i])
+                            i += 1
+                        elif cn == '*':
+                            inCommentMulti = True
+                            t.append(s[fromIndex:i])
+                            i += 1
+
+            elif inCommentSingle and (c == '\n' or c == '\r'):
+                inCommentSingle = False
+                fromIndex = i
+
+            elif inCommentMulti and c == '*' and i + 1 < l and s[i + 1] == '/':
+                inCommentMulti = False
+                i += 1
+                fromIndex = i + 1
+
+            i += 1
+
+        if not inCommentSingle and not inCommentMulti:
+            t.append(s[fromIndex:len(s)])
+
+        return "".join(t)
