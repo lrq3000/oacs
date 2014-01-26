@@ -1,7 +1,25 @@
 #!/usr/bin/env python
 # encoding: utf-8
+#
+# OACS
+# Copyright (C) 2013 Larroque Stephen
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 from auxlib import *
+from collections import OrderedDict
 
 json = import_module('ujson')
 if json is None:
@@ -83,11 +101,25 @@ class ConfigParser(object):
 
     # Get a value from the config dict (this is a proxy method)
     def get(self, *args, **kwargs):
-        return self.config.get(*args, **kwargs)
+        if isinstance(self.config, (dict, OrderedDict)):
+            return self.config.get(*args, **kwargs)
+        else:
+            # Safe list getter, with exception handling and default value supplied
+            try:
+                return self.config[args[0]]
+            except IndexError:
+                if len(args > 1):
+                    return args[1]
+                else: # by default if no default value was specified, we return None (just like for dictionaries)
+                    return None
 
     # Set a value in the config dict (this is a proxy method)
     def set(self, *args, **kwargs):
-        return self.config.set(*args, **kwargs)
+        return self.config.update(*args, **kwargs)
+
+    # Set a value in the config dict (this is a proxy method)
+    def update(self, *args, **kwargs):
+        return self.config.update(*args, **kwargs)
 
     ## Filter efficiently Javascript-like inline and multiline comments from a JSON file
     # Author: WizKid https://gist.github.com/WizKid/1170297
