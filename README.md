@@ -20,3 +20,4 @@ TODO:
 * Add more pertinent variables in the OpenArena to OACS bridge (eg, the reaction time from ExcessivePlus?)
 * Add scikit-learn module to leverage all the machine learning algorithms available in scikit-learn
 * Lower the number of false positives (ie, make the ROC curve more fit)
+* Merge with the newer core available in [author-detector](https://github.com/lrq3000/author-detector) project.
