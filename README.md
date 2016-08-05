@@ -12,7 +12,7 @@ https://www.youtube.com/watch?v=0b2FfukdqW4
 A slides presentation explaining the design and how OACS works can be found here:
 http://fr.slideshare.net/lrq3000/open-anticheat-system-oacs
 
-For more informations, consult the developer's documentation inside the doc/ folder.
+For more informations, consult the developer's doxygen documentation (in english) and the manuals and technical report (both in french) inside the doc/ folder.
 
 But here's the TL;DR version: it works, but not enough to be used in real applications yet.
 
