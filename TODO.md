@@ -1,3 +1,3 @@
 * Cheating types (see also the slides presentation inside this OACS project with more academic sources): https://home.cc.gatech.edu/webb/uploads/10/MiniProject3.pdf
 * Another cheating presentation (with Luigi Auriemma!!!): https://media.blackhat.com/eu-13/briefings/Ferrante/bh-eu-13-multiplayer-online-games-ferrante-slides.pdf
-* See [https://en.wikipedia.org/wiki/Change_detection](change point detection) and maybe [Change Point Algorithm from Randy Gallistel](https://github.com/mrhunsaker/Change_Point), would be perfect for anomaly detection and also to detect changes in behavior (ie, when player activates a cheat only temporarily).
+* See [change point detection](https://en.wikipedia.org/wiki/Change_detection) and maybe [Change Point Algorithm from Randy Gallistel](https://github.com/mrhunsaker/Change_Point), would be perfect for anomaly detection and also to detect changes in behavior (ie, when player activates a cheat only temporarily).
